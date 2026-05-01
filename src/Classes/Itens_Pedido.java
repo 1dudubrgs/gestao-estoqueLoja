@@ -1,0 +1,22 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package Classes;
+
+import java.time.LocalDate;
+
+/**
+ *
+ * @author eduardobp
+ */
+public class Itens_Pedido {
+    private int id;
+    //id_pedido
+    //id_produto
+    private int quantidade;
+    private double preco_unitario;
+    private double subtotal;
+    private LocalDate data_criacao;
+    private LocalDate data_modificacao;
+}
