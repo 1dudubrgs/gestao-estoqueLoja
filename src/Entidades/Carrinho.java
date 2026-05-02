@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Classes;
+package Entidades;
 
 import java.time.LocalDate;
 
@@ -10,12 +10,10 @@ import java.time.LocalDate;
  *
  * @author eduardobp
  */
-public class Movimentacao_Estoque {
+public class Carrinho {
     private int id;
-    //id_produto
-    private int quantidade;
-    private String tipo;
-    private double valor_unitario;
+    //id usuario
+    private String status;
     private LocalDate data_criacao;
     private LocalDate data_modificacao;
 }

@@ -12,6 +12,14 @@ import javax.swing.JOptionPane;
  */
 public class Tela_Login {
     public static void main(String[] args) {
-        JOptionPane.showMessageDialog(null, "Agora estou na tela de login");
+        String loginMsg = """
+                          Por favor, insira seu login:
+                          """;
+        
+        String senhaMsg = """
+                          Por favor, insira a sua senha:
+                          """;
+        
+        String resp = JOptionPane.showInputDialog(loginMsg);
     }
 }
