@@ -22,7 +22,6 @@ public class ProdutosDAO {
     @Override
     public String toString() {
         String string = "Produtos registrados no Sistema:\n\n";
-        int cont = 0;
         
         boolean vazio = this.estaVazio();
            

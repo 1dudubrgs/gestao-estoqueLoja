@@ -44,7 +44,7 @@ public class Tela_Inicial {
                         
                         Selecione uma das opções abaixo:
                         
-                        1 - Consultar Lista de Pedidos
+                        1 - Consultar Lista de Produtos
                         2 - Fazer login
                         3 - Realizar Cadastro
                         0 - Sair""";
@@ -75,7 +75,7 @@ public class Tela_Inicial {
                     boolean sair = false;
                     
                     
-                    while(!sair ){
+                    while(!sair){
                         String inputLog = JOptionPane.showInputDialog(
                                 """
                                                              Por favor, insira o seu login (ENTER para cancelar):
