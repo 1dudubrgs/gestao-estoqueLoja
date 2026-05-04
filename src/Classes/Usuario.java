@@ -67,10 +67,6 @@ public class Usuario {
         return data_criacao;
     }
 
-    public void setData_criacao() {
-       
-    }
-
     public LocalDate getData_modificacao() {
         return data_modificacao;
     }

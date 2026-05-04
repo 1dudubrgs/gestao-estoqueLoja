@@ -125,8 +125,7 @@ public class Produto {
         return this.id == other.id;
     }
 
-    @Override
-    public String toString() {
+    public String toString(int num) {
         DateTimeFormatter FormaData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String CriacaoFormatado = data_criacao.format(FormaData);
         String ModificacaoFormatado = data_modificacao.format(FormaData);
@@ -137,6 +136,9 @@ public class Produto {
         else
             ativoText = "Não";
         
-        return "ID = " + id + "\nQuantidade = " + quantidade + "\nNome = " + nome + "\nDescricao = " + descricao + "\nPreço = R$" + preco_venda + "\nAtivo: " + ativoText + "\nCriado em: " + CriacaoFormatado + "\nModificado em: " + ModificacaoFormatado;
+        if(num == 0)
+            return "ID = " + id + "\nNome = " + nome + "\nDescricao = " + descricao + "\nQuantidade = " + quantidade +  "\nPreço = R$" + preco_venda + "\nAtivo: " + ativoText + "\nCriado em: " + CriacaoFormatado + "\nModificado em: " + ModificacaoFormatado;
+        else
+            return "ID = " + id + "\nNome = " + nome + "\nDescricao = " + descricao + "\nQuantidade = " + quantidade + "\nPreço = R$" + preco_venda;
     }
 }

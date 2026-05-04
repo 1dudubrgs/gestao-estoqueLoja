@@ -1,7 +1,9 @@
 package Telas;
 
+import Classes.Carrinho;
 import Classes.Produto;
 import Classes.Usuario;
+import DAOs.CarrinhoDAO;
 import DAOs.PessoaDAO;
 import DAOs.ProdutosDAO;
 import DAOs.UsuarioDAO;
@@ -20,7 +22,7 @@ import javax.swing.JOptionPane;
  */
 public class Tela_Usuarios {
 
-    public static void main(Usuario user, Calendario calendario, PessoaDAO bancoPessoas, UsuarioDAO bancoUsuarios, ProdutosDAO bancoProdutos) {
+    public static void main(Usuario user, Calendario calendario, PessoaDAO bancoPessoas, UsuarioDAO bancoUsuarios, ProdutosDAO bancoProdutos, CarrinhoDAO bancoCarrinhos) {
 
         String tipoUser = user.getTipo();
 
@@ -34,7 +36,7 @@ public class Tela_Usuarios {
             3 - Movimentação do Estoque
             4 - Manejar Pedidos
             5 - Manejar Pessoas
-            6 - Manjear Usuários
+            6 - Manejar Usuários
             7 - Manejar Produtos
             8 - Alterar Data Atual do Sistema
             9 - Relatório de vendas
@@ -240,7 +242,7 @@ public class Tela_Usuarios {
                                     else
                                         JOptionPane.showMessageDialog(null, "Nao há produtos para alterar!");
                                 }
-                                case "3" -> {JOptionPane.showMessageDialog(null, bancoProdutos.toString());}
+                                case "3" -> {JOptionPane.showMessageDialog(null, bancoProdutos.toString(0));}
                                 case "4" -> {
                                     
                                     boolean vazio = bancoProdutos.estaVazio();
@@ -294,25 +296,105 @@ public class Tela_Usuarios {
             String painelCliente
                     = "Seja bem vindo, " + user.getPessoa().getNome() + "!\n\n Selecione uma das ações abaixo:\n\n"
                     + """
-            1 - Manejar Carrinhos
-            2 - Ver Produtos
-            3 - Comprar Produtos
-            4 - Relatório de Pedidos
-            5 - Deslogar
+            1 - Manejar Carrinho
+            2 - Ver Produtos à venda
+            3 - Relatório de Pedidos
+            4 - Deslogar
             """;
 
-            while (!inputPainelC.equals("5")) {
+            while (!inputPainelC.equals("4")) {
                 inputPainelC = JOptionPane.showInputDialog(painelCliente);
                 switch (inputPainelC) {
                     case "1" -> {
+                        //Ao finalizar gera um PEDIDO,  ITENS_PEDIDO e MOVIMENTACAO_ESTOQUE
+                        boolean vazio = bancoCarrinhos.estaVazio();
+                        String resp = "";
+                                    
+                        if (!vazio) {
+
+                            while (!resp.equals("0")) {
+                                resp = JOptionPane.showInputDialog(null, bancoCarrinhos.toString() + """
+                                                                    \n\nSelecione uma das ações abaixo: (ENTER para sair)
+
+                                                                    1 - Editar carrinho
+                                                                    2 - Finalizar carrinho
+                                                                    3 - Cancelar carrinho
+                                                                    0 - Sair do carrinho                      
+                                                                    """);
+                                
+                                switch (resp) {
+                                    case "1" -> {}
+                                    case "2" -> {}
+                                    case "3" -> {}
+                                    case "0" -> {JOptionPane.showMessageDialog(null, "Saindo do carrinho...");}
+                                    default -> JOptionPane.showMessageDialog(null, "Opção Invalida! Tente novamente");
+                                }
+                            }
+                        }
+                        else
+                            JOptionPane.showMessageDialog(null, bancoCarrinhos.toString());;
                     }
                     case "2" -> {
+                        boolean vazio = bancoProdutos.estaVazio();
+                                    
+                        if (!vazio) {
+                            boolean pararID = false;
+
+                            while (!pararID) {
+                                String id = JOptionPane.showInputDialog(null, bancoProdutos.toString(1) + "\n\nDigite o ID do produto que deseja comprar (ENTER para sair)");
+                                if (!id.equals("")) {
+                                    int idINT = Integer.parseInt(id);
+                                    if (bancoProdutos.pesquisarProduto(idINT) != null && bancoProdutos.pesquisarProduto(idINT).isAtivo()) {
+                                        pararID = true;
+
+                                        boolean pararCompra = false;
+                                        while (!pararCompra) {
+                                            String opcCompra = JOptionPane.showInputDialog("""
+                                                                    Selecione uma das ações abaixo: (ENTER para sair)
+
+                                                                    1 - Adicionar ao carrinho
+                                                                    2 - Comprar diretamente
+                                                                    """);
+
+                                            if (!opcCompra.equals("")) {
+                                                int opcCompraINT = Integer.parseInt(opcCompra);
+
+                                                switch (opcCompraINT) {
+                                                    case 1 -> {
+                                                        //É criado um  ITENS_CARRINHO
+                                                        if(!bancoCarrinhos.jaExiste(user.getId())){
+                                                            Carrinho novoCarrinho = new Carrinho(user, calendario.getDataHoje(), bancoCarrinhos);
+                                                        }
+                                                        pararCompra = true;
+                                                    }
+                                                    case 2 -> {
+                                                        //Gera um PEDIDO,  ITENS_PEDIDO e MOVIMENTACAO_ESTOQUE
+                                                        pararCompra = true;
+                                                    }
+                                                    default ->
+                                                        JOptionPane.showMessageDialog(null, "Insira um valor válido!");
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Cancelando compra de produto...");
+                                                pararCompra = true;
+                                            }
+                                        }
+                                    } else {
+                                        JOptionPane.showMessageDialog(null, "ID não encontrado, tente novamente.");
+                                    }
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "Cancelando compra de produto...");
+                                    pararID = true;
+                                }
+                            }
+                        }
+                        else
+                            JOptionPane.showMessageDialog(null, bancoProdutos.toString(1));;
+                        
                     }
                     case "3" -> {
                     }
-                    case "4" -> {
-                    }
-                    case "5" -> {JOptionPane.showMessageDialog(null, "Deslogando..");}
+                    case "4" -> {JOptionPane.showMessageDialog(null, "Deslogando..");}
                     default ->
                         JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
                 }

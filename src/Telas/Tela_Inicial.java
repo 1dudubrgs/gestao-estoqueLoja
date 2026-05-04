@@ -5,13 +5,17 @@
 package Telas;
 
 import Classes.Administrador;
+import Classes.Carrinho;
 import Classes.Cliente;
+import Classes.Itens_Carrinho;
 import DAOs.PessoaDAO;
 import Classes.Pessoa;
 import Classes.Produto;
 import Classes.Usuario;
 import DAOs.ProdutosDAO;
 import DAOs.UsuarioDAO;
+import DAOs.CarrinhoDAO;
+import DAOs.Itens_CarrinhoDAO;
 import Sistema.Calendario;
 import java.time.LocalDate;
 import java.time.Month;
@@ -29,6 +33,8 @@ public class Tela_Inicial {
         PessoaDAO bancoPessoas = new PessoaDAO(new Pessoa[100]);
         UsuarioDAO bancoUsuarios = new UsuarioDAO(new Usuario[100]);
         ProdutosDAO bancoProdutos = new ProdutosDAO(new Produto[100]);
+        CarrinhoDAO bancoCarrinhos = new CarrinhoDAO(new Carrinho[100]);
+        Itens_CarrinhoDAO bancoItens_Carrinho = new Itens_CarrinhoDAO(new Itens_Carrinho[100]);
         
         //CRIANDO PESSOAS ADMIN;
         Pessoa pessoaAdmin1 = new Pessoa("Eduardo Borges Pereira", LocalDate.of(2007, Month.JANUARY, 22), "185.824.286-00", sistemaCalendario.getDataHoje(), bancoPessoas);
@@ -44,7 +50,7 @@ public class Tela_Inicial {
                         
                         Selecione uma das opções abaixo:
                         
-                        1 - Consultar Lista de Produtos
+                        1 - Consultar Lista de Produtos à venda
                         2 - Fazer login
                         3 - Realizar Cadastro
                         0 - Sair""";
@@ -68,7 +74,7 @@ public class Tela_Inicial {
             
             resp = JOptionPane.showInputDialog(menu_I);
             switch (resp) {
-                case "1" -> {}
+                case "1" -> {JOptionPane.showMessageDialog(null, bancoProdutos.toString(1));}
                 case "2" -> {
                     int opc = 0;
                     String inputSenha;
@@ -88,7 +94,7 @@ public class Tela_Inicial {
 
                             if (bancoUsuarios.senhaExistente(inputSenha)) {
                                 JOptionPane.showMessageDialog(null, "Login efetuado com sucesso!");
-                                Tela_Usuarios.main(bancoUsuarios.getUsuário(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos);
+                                Tela_Usuarios.main(bancoUsuarios.getUsuário(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos);
                                 sair = true;
                             } else if (inputSenha.equals("")) {
                                 JOptionPane.showMessageDialog(null, "Cancelando o login...");

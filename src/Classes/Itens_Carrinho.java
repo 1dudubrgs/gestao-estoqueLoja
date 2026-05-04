@@ -12,10 +12,10 @@ import java.time.LocalDate;
  */
 public class Itens_Carrinho {
     private int id;
-    //id_carrinho
-    //id_produto
+    private int id_carrinho;
+    private int id_produto;
     private int quantidade;
-    //preco_unitario - produto
+    private double preco_unitario;
     private LocalDate data_criacao;
     private LocalDate data_modificacao;
 }

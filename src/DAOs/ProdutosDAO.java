@@ -19,16 +19,25 @@ public class ProdutosDAO {
         this.listaProdutos = listaProdutos;
     }
     
-    @Override
-    public String toString() {
-        String string = "Produtos registrados no Sistema:\n\n";
+    public String toString(int num) {
+        String string = "";
         
         boolean vazio = this.estaVazio();
            
         if(!vazio){
-            for (Produto index : listaProdutos) {
-                if(index != null)
-                    string += index + "\n\n"; 
+            if(num == 0){
+                string = "Produtos registrados no Sistema:\n\n";
+                for (Produto index : listaProdutos) {
+                    if(index != null)
+                        string += index.toString(num) + "\n\n"; 
+                }
+            }
+            else{
+                string = "Produtos à venda no Sistema:\n\n";
+                for (Produto index : listaProdutos) {
+                    if(index != null && index.isAtivo())
+                        string += index.toString(num) + "\n\n"; 
+                }
             }
         }
         else
