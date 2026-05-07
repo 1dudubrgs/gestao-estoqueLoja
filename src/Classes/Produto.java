@@ -8,6 +8,7 @@ import DAOs.ProdutosDAO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import Sistema.Calendario;
 
 /**
  *
@@ -43,6 +44,9 @@ public class Produto {
 
     public void setQuantidade(int quantidade) {
         this.quantidade = quantidade;
+        if(quantidade == 0){
+            this.setAtivo(false);
+        }
     }
     
     public int getId() {
@@ -95,6 +99,10 @@ public class Produto {
 
     public void setData_modificacao(LocalDate data_modificacao) {
         this.data_modificacao = data_modificacao;
+    }
+    
+    public void vendaProduto(int quantidade){
+        this.setQuantidade(this.getQuantidade() - quantidade);
     }
 
     @Override

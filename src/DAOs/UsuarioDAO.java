@@ -4,7 +4,9 @@
  */
 package DAOs;
 
+import Classes.Pessoa;
 import Classes.Usuario;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -48,7 +50,7 @@ public class UsuarioDAO {
         return false;
     }
     
-    public Usuario getUsuário(String login, String senha){
+    public Usuario UsuárioLogin(String login, String senha){
         Usuario usuarioRetornar = null;
         
         for(int i = 0; i < this.listaUsuarios.length; i++){
@@ -60,6 +62,44 @@ public class UsuarioDAO {
             }
         }
         return usuarioRetornar;
+    }
+    
+    public boolean PessoaJaCadastrada(Pessoa pessoa){
+        for(int i = 0; i < this.listaUsuarios.length; i++){
+            if(this.listaUsuarios[i] != null && this.listaUsuarios[i].getPessoa().equals(pessoa)){
+                JOptionPane.showMessageDialog(null, "A pessoa inserida já possui um usuário!");
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public boolean IDUsuarioExiste(int ID){
+        for(int i = 0; i<this.listaUsuarios.length; i++){
+            if(this.listaUsuarios[i] != null && this.listaUsuarios[i].getId() == ID)
+                return true;
+        }
+        
+        JOptionPane.showMessageDialog(null, "O ID inserido não existe! Tente novamente");
+        return false;
+    }
+    
+    public Usuario ProcurarUsuarioID (int ID){
+        for(int i = 0; i<this.listaUsuarios.length; i++){
+            if(this.listaUsuarios[i] != null && this.listaUsuarios[i].getId() == ID)
+                return this.listaUsuarios[i];
+        }
+        return null;
+    }
+    
+    public void RemoverUsuario(Usuario usuario){
+        for(int i = 0; i < this.listaUsuarios.length; i++){
+            if(this.listaUsuarios[i] != null && this.listaUsuarios[i].equals(usuario)){
+                JOptionPane.showMessageDialog(null, "Usuário Removido com Sucesso!");
+                i = this.listaUsuarios.length;
+            }
+        }
     }
 
     @Override

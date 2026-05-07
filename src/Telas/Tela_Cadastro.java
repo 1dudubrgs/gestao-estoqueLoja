@@ -35,8 +35,8 @@ public class Tela_Cadastro {
                 inputDataNascimento = JOptionPane.showInputDialog("Digite a sua data de nascimento (ENTER para cancelar)\nESCREVA DA SEGUINTE FORMA: (ano-mes-dia):");
                 if(!inputDataNascimento.equals("")){
                     while(!sairCPF){
-                        inputCPF = JOptionPane.showInputDialog("Digite o seu CPF (ENTER para cancelar):\nESCREVA DA SEGUINTE FORMA: 000.000.00-00");
-                        if(!bancoPessoas.jaExiste(inputCPF) && (!inputCPF.equals(""))){
+                        inputCPF = JOptionPane.showInputDialog("Digite o seu CPF (ENTER para cancelar):\nESCREVA DA SEGUINTE FORMA: 000.000.000-00");
+                        if(!bancoPessoas.jaExisteCPF(inputCPF) && (!inputCPF.equals(""))){
                             while(!sairLogin){
                                 inputLogin = JOptionPane.showInputDialog("Digite o seu Login (ENTER para cancelar):");
                                 if(!bancoUsuarios.loginExistente(inputLogin) && (!inputLogin.equals(""))){

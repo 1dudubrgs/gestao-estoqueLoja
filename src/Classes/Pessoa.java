@@ -84,7 +84,7 @@ public class Pessoa {
         String CriacaoFormatado = data_cricao.format(FormaData);
         String ModificacaoFormatado = data_modificacao.format(FormaData);
         
-        return "ID = " + id + "\nNome = " + nome + "\nNascimento = " + NascimentoFormatado + "\nCPF = " + cpf + "\nData de Criação = " + CriacaoFormatado + "\nData de Criação = " + ModificacaoFormatado;
+        return "ID = " + id + "\nNome = " + nome + "\nNascimento = " + NascimentoFormatado + "\nCPF = " + cpf + "\nData de Criação = " + CriacaoFormatado + "\nData de Modificação = " + ModificacaoFormatado;
     }
 
     @Override

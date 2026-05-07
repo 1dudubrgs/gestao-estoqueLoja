@@ -50,10 +50,6 @@ public class Carrinho {
         return data_criacao;
     }
 
-    public void setData_criacao(LocalDate data_criacao) {
-        this.data_criacao = data_criacao;
-    }
-
     public LocalDate getData_modificacao() {
         return data_modificacao;
     }

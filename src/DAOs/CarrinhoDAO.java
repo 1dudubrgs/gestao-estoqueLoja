@@ -48,25 +48,64 @@ public class CarrinhoDAO {
         return string;
     }
     
-    public boolean estaVazio(){
+    public boolean estaVazio(int id_usuario){
         int cont = 0;
+        int aux = 0;
         for(int i = 0; i < this.listaCarrinhos.length; i++){
             if(this.listaCarrinhos[i] == null)
                 cont++;
+            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getId_usuario() == id_usuario && this.listaCarrinhos[i].getStatus() == "Aberto"){
+                aux = 1;
+            }
         }
         
-        if(cont == this.listaCarrinhos.length)
+        if(cont == this.listaCarrinhos.length || aux == 0)
             return true;
         
         return false;
     }
     
+    public boolean estaTodosVazio(){
+        int cont = 0;
+        int aux = 0;
+        for(int i = 0; i < this.listaCarrinhos.length; i++){
+            if(this.listaCarrinhos[i] == null)
+                cont++;
+            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getStatus() == "Aberto"){
+                aux = 1;
+            }
+        }
+        
+        if(cont == this.listaCarrinhos.length || aux == 0)
+            return true;
+        
+        return false;
+    }
+    
+    public Carrinho pesquisarCarrinho(int id_usuario){
+        for (Carrinho listaCarrinho : this.listaCarrinhos) {
+            if (listaCarrinho != null && listaCarrinho.getId_usuario() == id_usuario && listaCarrinho.getStatus().equals("Aberto")) {
+                return listaCarrinho;
+            }
+        }
+        return null;
+    }
+    
     public boolean jaExiste(int id_usuario){
         for (Carrinho listaCarrinho : this.listaCarrinhos) {
-            if (listaCarrinho != null && listaCarrinho.getId_usuario() == id_usuario) {
+            if (listaCarrinho != null && listaCarrinho.getId_usuario() == id_usuario && listaCarrinho.getStatus().equals("Aberto")) {
                 return true;
             }
         }
         return false;
+    }
+    
+    public void removerCarrinho(int ID){
+        for(int i = 0; i < this.listaCarrinhos.length; i++){
+            if(this.listaCarrinhos[i].getId() == ID){
+                this.listaCarrinhos[i] = null;
+                i = this.listaCarrinhos.length;
+            }
+        }
     }
 }

@@ -4,7 +4,9 @@
  */
 package Classes;
 
+import DAOs.Itens_CarrinhoDAO;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -18,4 +20,66 @@ public class Itens_Carrinho {
     private double preco_unitario;
     private LocalDate data_criacao;
     private LocalDate data_modificacao;
+    
+    private static int cont = 1;
+    
+    public Itens_Carrinho(Carrinho carrinho, Produto produto, int quantidade, LocalDate data_criacao, Itens_CarrinhoDAO bancoItens_Carrinho) {
+        this.id = cont++;
+        this.id_carrinho = carrinho.getId();
+        this.id_produto = produto.getId();
+        this.quantidade = quantidade;
+        produto.setQuantidade(produto.getQuantidade() - quantidade);
+        this.preco_unitario = produto.getPreco_venda();
+        this.data_criacao = data_criacao;
+        this.data_modificacao = this.data_criacao;
+        bancoItens_Carrinho.adicionarItens_Carrinho(this);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getId_carrinho() {
+        return id_carrinho;
+    }
+
+    public int getId_produto() {
+        return id_produto;
+    }
+
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public double getPreco_unitario() {
+        return preco_unitario;
+    }
+
+    public LocalDate getData_criacao() {
+        return data_criacao;
+    }
+
+    public LocalDate getData_modificacao() {
+        return data_modificacao;
+    }
+
+    public void setData_modificacao(LocalDate data_modificacao) {
+        this.data_modificacao = data_modificacao;
+    }
+    
+    public String toString(int num) {
+        DateTimeFormatter FormaData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String CriacaoFormatada = data_criacao.format(FormaData);
+        String ModificacaoFormatada = data_modificacao.format(FormaData);
+        
+        if(num == 0)
+            return "ID = " + id + "\nID do Carrinho = " + id_carrinho + "\nID do Produto = " + id_produto + "\nQuantidade=" + quantidade + "\nPreço Unitário = " + preco_unitario + "\nData de Criação = " + CriacaoFormatada + "\nData de Modificação = " + ModificacaoFormatada;
+        else
+            return "ID do Produto = " + id_produto + "\nQuantidade = " + quantidade + "\nPreço Unitário = " + preco_unitario;
+    }
+    
 }

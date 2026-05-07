@@ -5,6 +5,7 @@
 package DAOs;
 
 import Classes.Pessoa;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,20 +20,48 @@ public class PessoaDAO {
     
     public void adicionarPessoa(Pessoa pessoa){
         for(int i = 0; i < this.Pessoas.length; i++){
-            if(this.Pessoas[i] == null && !(jaExiste(pessoa.getCpf()))){
+            if(this.Pessoas[i] == null && !(jaExisteCPF(pessoa.getCpf()))){
                 this.Pessoas[i] = pessoa;
                 i = this.Pessoas.length;
             }
         }
     }
     
-    public boolean jaExiste(String CPF){
+    public boolean jaExisteCPF(String CPF){
         for(int i = 0; i < this.Pessoas.length; i++){
             if(this.Pessoas[i] != null && this.Pessoas[i].getCpf().equals(CPF)){
                 return true;
             }
         }
         return false;
+    }
+    
+    public boolean jaExisteID(int ID){
+        for(int i = 0; i < this.Pessoas.length; i++){
+            if(this.Pessoas[i] != null && this.Pessoas[i].getId() == ID){
+                return true;
+            }
+        }
+        JOptionPane.showMessageDialog(null, "O ID inserido não existe! Tente novamente.");
+        return false;
+    }
+    
+    public Pessoa retornarPessoaID(int ID){
+        for(int i = 0; i < this.Pessoas.length; i++){
+            if(this.Pessoas[i] != null && this.Pessoas[i].getId() == ID){
+                return this.Pessoas[i];
+            }
+        }
+        return null;
+    }
+
+    public void removerPessoaID(int ID){
+        for(int i = 0; i < this.Pessoas.length; i++){
+            if(this.Pessoas[i].getId() == ID){
+                this.Pessoas[i] = null;
+                i = this.Pessoas.length;
+            }
+        }
     }
 
     @Override

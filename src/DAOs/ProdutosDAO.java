@@ -111,4 +111,19 @@ public class ProdutosDAO {
         
         return false;
     }
+    
+    public void retornarProdutos(CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, int id_usuario){
+        
+        for (Produto listaProduto : this.listaProdutos) {
+            if (listaProduto != null && bancoItens_Carrinho.jaExiste(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId())) {
+                this.pesquisarProduto(listaProduto.getId()).setQuantidade(this.pesquisarProduto(listaProduto.getId()).getQuantidade() + bancoItens_Carrinho.pesquisarItens_Carrinho(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId()).getQuantidade());
+            }
+        }
+    }
+    
+    public void retornarProduto(int id_produto, CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, int id_usuario, int quantidade){
+        
+        this.pesquisarProduto(id_produto).setQuantidade(this.pesquisarProduto(id_produto).getQuantidade() + quantidade);
+        this.pesquisarProduto(id_produto).setAtivo(true);
+}
 }

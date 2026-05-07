@@ -36,13 +36,27 @@ public class Tela_Inicial {
         CarrinhoDAO bancoCarrinhos = new CarrinhoDAO(new Carrinho[100]);
         Itens_CarrinhoDAO bancoItens_Carrinho = new Itens_CarrinhoDAO(new Itens_Carrinho[100]);
         
-        //CRIANDO PESSOAS ADMIN;
+        //CRIANDO PESSOAS ADMIN
         Pessoa pessoaAdmin1 = new Pessoa("Eduardo Borges Pereira", LocalDate.of(2007, Month.JANUARY, 22), "185.824.286-00", sistemaCalendario.getDataHoje(), bancoPessoas);
         Pessoa pessoaAdmin2 = new Pessoa("Felipe Lara Facin", LocalDate.of(2007, Month.APRIL, 18), "000.000.000-00", sistemaCalendario.getDataHoje(), bancoPessoas);
+        
+        //CRIANDO PESSOAS CLIENTE
+        Pessoa pessoaCliente1 = new Pessoa("Frederica Santos Batista", LocalDate.of(1982, Month.FEBRUARY, 14), "321.555.402-20", sistemaCalendario.getDataHoje(), bancoPessoas);
+        Pessoa pessoaCliente2 = new Pessoa("a", LocalDate.of(2007, Month.JANUARY, 22), "111.111.111-11", sistemaCalendario.getDataHoje(), bancoPessoas);
+        Pessoa pessoaCliente3 = new Pessoa("b", LocalDate.of(2007, Month.APRIL, 18), "222.222.222-22", sistemaCalendario.getDataHoje(), bancoPessoas);
         
         //CRIANDO USUARIOS ADMIN
         Usuario admin1 = new Administrador(pessoaAdmin1, "admin1", "AcessarLoja", sistemaCalendario.getDataHoje(), bancoUsuarios);
         Usuario admin2 = new Administrador(pessoaAdmin2, "admin2", "AcessarLoja", sistemaCalendario.getDataHoje(), bancoUsuarios);
+        
+        //CRIANDO USUARIOS CLIENTE
+        Usuario cliente1 = new Cliente(pessoaCliente1, "frederica", "123", sistemaCalendario.getDataHoje(), bancoUsuarios);
+        Cliente cliente2 = new Cliente(pessoaCliente2, "a", "a", sistemaCalendario.getDataHoje(), bancoUsuarios);
+        Cliente cliente3 = new Cliente(pessoaCliente3, "b", "b", sistemaCalendario.getDataHoje(), bancoUsuarios);
+        
+        //CRIANDO PRODUTOS
+        Produto produto1 = new Produto(10, "a", "a", 10.10, sistemaCalendario.getDataHoje(), bancoProdutos);
+        Produto produto2 = new Produto(20, "b", "b", 20.20, sistemaCalendario.getDataHoje(), bancoProdutos);
         
         String resp = "";
         String menu_I = """
@@ -94,7 +108,7 @@ public class Tela_Inicial {
 
                             if (bancoUsuarios.senhaExistente(inputSenha)) {
                                 JOptionPane.showMessageDialog(null, "Login efetuado com sucesso!");
-                                Tela_Usuarios.main(bancoUsuarios.getUsuário(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos);
+                                Tela_Usuarios.main(bancoUsuarios.UsuárioLogin(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos, bancoItens_Carrinho);
                                 sair = true;
                             } else if (inputSenha.equals("")) {
                                 JOptionPane.showMessageDialog(null, "Cancelando o login...");
