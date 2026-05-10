@@ -4,10 +4,18 @@ import Classes.Carrinho;
 import Classes.Cliente;
 import Classes.Pessoa;
 import Classes.Itens_Carrinho;
+import Classes.Pedido;
+import Classes.Cupom;
+import Classes.Itens_Pedido;
+import Classes.Movimentacao_Estoque;
 import Classes.Produto;
 import Classes.Usuario;
+import DAOs.CuponsDAO;
 import DAOs.CarrinhoDAO;
 import DAOs.Itens_CarrinhoDAO;
+import DAOs.Itens_PedidoDAO;
+import DAOs.Movimentacao_EstoqueDAO;
+import DAOs.PedidosDAO;
 import DAOs.PessoaDAO;
 import DAOs.ProdutosDAO;
 import DAOs.UsuarioDAO;
@@ -27,7 +35,7 @@ import javax.swing.JOptionPane;
  */
 public class Tela_Usuarios {
 
-    public static void main(Usuario user, Calendario calendario, PessoaDAO bancoPessoas, UsuarioDAO bancoUsuarios, ProdutosDAO bancoProdutos, CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho) {
+    public static void main(Usuario user, Calendario calendario, PessoaDAO bancoPessoas, UsuarioDAO bancoUsuarios, ProdutosDAO bancoProdutos, CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, PedidosDAO bancoPedidos, CuponsDAO bancoCupons, Itens_PedidoDAO bancoItens_Pedido, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque) {
 
         String tipoUser = user.getTipo();
 
@@ -36,32 +44,294 @@ public class Tela_Usuarios {
             String painelAdmin
                     = "!PAINEL DE ADMISTRADOR!\n\nSeja bem vindo, " + user.getPessoa().getNome() + "!\n\n Selecione uma das ações abaixo:\n\n"
                     + """
-            1 - Manejar Cupons
-            2 - Manejar Entregas
-            3 - Movimentação do Estoque
-            4 - Manejar Pedidos
-            5 - Manejar Pessoas
-            6 - Manejar Usuários
-            7 - Manejar Produtos
-            8 - Alterar Data Atual do Sistema
-            9 - Relatório de vendas
-            10 - Relatório de Pedidos
-            11 - Relatório de Faturamento
-            12 - Deslogar
+            1 - Manejar Cupons         
+            2 - Manejar Pedidos
+            3 - Manejar Pessoas
+            4 - Manejar Usuários
+            5 - Manejar Produtos
+            6 - Alterar Data Atual do Sistema
+            7 - Listar Movimentações de Estoque
+            8 - Relatório de vendas
+            9 - Relatório de Pedidos
+            10 - Relatório de Faturamento
+            11 - Deslogar
             """;
 
-            while (!inputPainelA.equals("12")) {
+            while (!inputPainelA.equals("11")) {
                 inputPainelA = JOptionPane.showInputDialog(painelAdmin);
                 switch (inputPainelA) {
                     case "1" -> {
+                        boolean sair = false;
+                        String opcoes = """
+                                        1 - Adicionar um Cupon
+                                        2 - Editar um Cupon
+                                        3 - Listar os Cupons
+                                        4 - Remover um Cupon
+                                        5 - Sair
+                                        """;
+                        
+                        while(!sair){
+                            String escolhaCupon = JOptionPane.showInputDialog("Digite o que deseja fazer com os cupons a partir das opções abaixo:\n\n" + opcoes);
+                            switch(escolhaCupon){
+                                case "1" -> {
+                                    boolean codigoExiste = true;
+                                    
+                                    while(codigoExiste){
+                                        String codigo = JOptionPane.showInputDialog("Digite o código do novo cupom (ENTER para sair):");
+                                        if(!codigo.equals("") && (bancoCupons.procurarCupomCODIGO(codigo) == null || bancoCupons.estaVazio())){
+                                            codigoExiste = false;
+                                            boolean tipoValido = false;
+
+                                            while(!tipoValido){
+                                                String tipoDesconto = JOptionPane.showInputDialog("Digite o tipo do cupom - FIXO ou PERCENTUAL - (ENTER para sair): ");
+                                                if(!tipoDesconto.equals("")){
+                                                    if(tipoDesconto.equals("FIXO") || tipoDesconto.equals("PERCENTUAL")){
+                                                        tipoValido = true;
+
+                                                        boolean validarValDesconto = false;
+                                                        while(!validarValDesconto){
+                                                            String valorDesconto = JOptionPane.showInputDialog("Digite o valor do desconto - 1 a 100 - (ENTER para sair): ");
+                                                            if(!valorDesconto.equals("")){
+                                                                double valorDescontoDOUBLE = Double.parseDouble(valorDesconto);
+                                                                if(valorDescontoDOUBLE > 0 && valorDescontoDOUBLE <= 100){
+                                                                    validarValDesconto = true;
+
+                                                                    boolean validarValMinimo = false;
+                                                                    while(!validarValMinimo){
+                                                                        String valMinimo = JOptionPane.showInputDialog("Digite o valor mínimo do pedido - Minimo R$1,00 - (ENTER para sair): ");
+                                                                        if(!valMinimo.equals("")){
+                                                                            double valMinimoDOUBLE = Double.parseDouble(valMinimo);
+                                                                            if(valMinimoDOUBLE > 0){
+                                                                                validarValMinimo = true;
+
+                                                                                DateTimeFormatter dma = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                                                                                String dataExpiracao = JOptionPane.showInputDialog("Digite a data de expiração do cupom (ENTER para sair):\nModelo: Dia/Mês/Ano");
+                                                                                if(!dataExpiracao.equals("")){
+                                                                                    LocalDate dataExpiracaoDATE = LocalDate.parse(dataExpiracao, dma);
+                                                                                    Cupom novoCupom = new Cupom(codigo, tipoDesconto, valorDescontoDOUBLE, valMinimoDOUBLE, dataExpiracaoDATE, calendario.getDataHoje(), bancoCupons);
+                                                                                    JOptionPane.showMessageDialog(null, "Cupom criado com sucesso!\nAVISO: O cupom já está ativado");
+                                                                                }
+                                                                                else{
+                                                                                    JOptionPane.showMessageDialog(null, "Cancelando criação de cupom...");
+                                                                                }
+                                                                            }
+                                                                            else{
+                                                                                JOptionPane.showMessageDialog(null, "Valor inserido inválido! Tente novamente.");
+                                                                            }
+                                                                        }
+                                                                        else{
+                                                                            validarValMinimo = true;
+                                                                            JOptionPane.showMessageDialog(null, "Cancelando criação de cupom...");
+                                                                        }
+                                                                    }
+                                                                }
+                                                                else{
+                                                                    JOptionPane.showMessageDialog(null, "Numero inserido inválido! Tente novamente");
+                                                                }
+                                                            }
+                                                            else{
+                                                                JOptionPane.showMessageDialog(null, "Cancelando criação de cupom...");
+                                                                validarValDesconto = true;
+                                                            }
+                                                        }
+                                                    }
+                                                    else{
+                                                        JOptionPane.showMessageDialog(null, "Valor inserido inválido! Tente novamente.");
+                                                    }
+                                                }
+                                                else{
+                                                    tipoValido = true;
+                                                    JOptionPane.showMessageDialog(null, "Cancelando criação de cupom...");
+                                                }
+                                            }
+
+                                        }
+                                        else if(!codigo.equals("") && bancoCupons.procurarCupomCODIGO(codigo) != null){
+                                            JOptionPane.showMessageDialog(null, "O código já existe! Tente novamente");
+                                        }
+                                        else{
+                                            codigoExiste = false;
+                                            JOptionPane.showMessageDialog(null, "Cancelando criação de cupom...");
+                                        }
+                                    }
+                                }
+                                case "2" -> {
+                                    if(!bancoCupons.estaVazio()){
+                                        boolean cupomExiste = false;
+                                        while(!cupomExiste){
+                                            String cupomid = JOptionPane.showInputDialog("Digite o ID do Cupom que deseja editar (ENTER para sair): ");
+                                            if(!cupomid.equals("")){
+                                                int cupomidINT = Integer.parseInt(cupomid);
+                                                if(bancoCupons.procurarCupomID(cupomidINT) != null){
+                                                    cupomExiste = true;
+
+                                                    boolean sairEdicao = false;
+                                                    Cupom cupom = bancoCupons.procurarCupomID(cupomidINT);
+
+                                                    String selecaoAtributo = """
+                                                                             1 - Alterar codigo
+                                                                             2 - Alterar tipo de desconto
+                                                                             3 - Alterar valor do desconto
+                                                                             4 - Alterar valor minimo do pedido
+                                                                             5 - Alterar data de validade
+                                                                             6 - Alterar status do cupom
+                                                                             7 - Sair
+                                                                             """;
+
+                                                    while(!sairEdicao){
+                                                        String selecao = JOptionPane.showInputDialog(selecaoAtributo);
+                                                        switch (selecao) {
+                                                            case "1" -> {
+                                                                boolean saircodigo = false;
+                                                                while(!saircodigo){
+                                                                    String novoCodigo = JOptionPane.showInputDialog("Digite o novo código (ENTER para sair): ");
+                                                                    if(!novoCodigo.equals("") && bancoCupons.procurarCupomCODIGO(novoCodigo) == null){
+                                                                        cupom.setCodigo(novoCodigo);
+                                                                        cupom.setData_modificacao(calendario.getDataHoje());
+                                                                        JOptionPane.showMessageDialog(null, "Codigo alterado com sucesso!");
+                                                                    }
+                                                                    else if(!novoCodigo.equals("") && bancoCupons.procurarCupomCODIGO(novoCodigo) != null){
+                                                                        JOptionPane.showMessageDialog(null, "O codigo inserido já existe! Tente novamente");
+                                                                    }
+                                                                    else{
+                                                                        JOptionPane.showMessageDialog(null, "Cancelando edição do codigo...");
+                                                                        saircodigo = true;
+                                                                    }
+                                                                }
+                                                            }
+                                                            case "2" -> {
+                                                                if("FIXO".equals(cupom.getTipo_desconto())){
+                                                                    cupom.setTipo_desconto("PERCENTUAL");
+                                                                    cupom.setData_modificacao(calendario.getDataHoje());
+                                                                    JOptionPane.showMessageDialog(null, "Tipo de desconto alterado com sucesso!");
+                                                                }
+                                                                else{
+                                                                    cupom.setTipo_desconto("FIXO");
+                                                                    cupom.setData_modificacao(calendario.getDataHoje());
+                                                                    JOptionPane.showMessageDialog(null, "Tipo de desconto alterado com sucesso!");
+                                                                }
+                                                            }
+                                                            case "3" -> {
+                                                                boolean sairvalor = false;
+                                                                while(!sairvalor){
+                                                                    String novoValor = JOptionPane.showInputDialog("Digite o novo valor do cupom (ENTER para sair): ");
+                                                                    if(!novoValor.equals("")){
+                                                                        double novoValorDOUBLE = Double.parseDouble(novoValor);
+                                                                        if(novoValorDOUBLE >= 1 && novoValorDOUBLE <= 100){
+                                                                            cupom.setValor_desconto(novoValorDOUBLE);
+                                                                            cupom.setData_modificacao(calendario.getDataHoje());
+                                                                            JOptionPane.showMessageDialog(null, "Valor de desconto do cupom alterado com sucesso!");
+                                                                        }
+                                                                        else{
+                                                                            JOptionPane.showMessageDialog(null, "Valor inserido inválido! Tente novamente.");
+                                                                        }
+                                                                    }
+                                                                    else{
+                                                                        sairvalor = true;
+                                                                        JOptionPane.showMessageDialog(null, "Cancelando mudança de valor do cupom...");
+                                                                    }
+                                                                }
+                                                            }
+                                                            case "4" -> {
+                                                                boolean sairminimo = false;
+                                                                while(!sairminimo){
+                                                                    String novoValor = JOptionPane.showInputDialog("Digite o novo valor minimo do pedido do cupom (ENTER para sair): ");
+                                                                    if(!novoValor.equals("")){
+                                                                        double novoValorDOUBLE = Double.parseDouble(novoValor);
+                                                                        if(novoValorDOUBLE > 0){
+                                                                            cupom.setValor_minimo_pedido(novoValorDOUBLE);
+                                                                            cupom.setData_modificacao(calendario.getDataHoje());
+                                                                            JOptionPane.showMessageDialog(null, "Valor mínimo do pedido do cupom alterado com sucesso!");
+                                                                        }
+                                                                        else{
+                                                                            JOptionPane.showMessageDialog(null, "Valor inserido inválido! Tente novamente.");
+                                                                        }
+                                                                    }
+                                                                    else{
+                                                                        sairminimo = true;
+                                                                        JOptionPane.showMessageDialog(null, "Cancelando mudança de valor minimo do pedido do cupom...");
+                                                                    }
+                                                                }
+                                                            }
+                                                            case "5" -> {
+                                                                DateTimeFormatter dma = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                                                                String novaData = JOptionPane.showInputDialog("Digite a nova data de validade do cupom (ENTER para sair): \nModelo: Dia/Mês/Ano");
+                                                                if(!novaData.equals("")){
+                                                                    LocalDate novaDataDATE = LocalDate.parse(novaData, dma);
+                                                                    cupom.setData_validade(novaDataDATE);
+                                                                    cupom.setData_modificacao(calendario.getDataHoje());
+                                                                    JOptionPane.showMessageDialog(null, "Data de validade do cupom alterada com sucesso!");
+                                                                }
+                                                                else{
+                                                                    JOptionPane.showMessageDialog(null, "Cancelando mudança de data de validade do cupom...");
+                                                                }
+                                                            }
+                                                            case "6" -> {
+                                                                if(cupom.isAtivo()){
+                                                                    cupom.setAtivo(false);
+                                                                    cupom.setData_modificacao(calendario.getDataHoje());
+                                                                    JOptionPane.showMessageDialog(null, "Cupom DESATIVADO com sucesso!");
+                                                                }
+                                                                else{
+                                                                    cupom.setAtivo(true);
+                                                                    cupom.setData_modificacao(calendario.getDataHoje());
+                                                                    JOptionPane.showMessageDialog(null, "Cupom ATIVADO com sucesso!");
+                                                                }
+                                                            }
+                                                            case "7" -> {sairEdicao = true;}
+                                                            default -> JOptionPane.showMessageDialog(null, "Seleção inválida! Tente novamente.");
+                                                        }
+                                                    }
+                                                }
+                                                else{
+                                                    JOptionPane.showMessageDialog(null, "ID inserido não existe! Tente novamente");
+                                                }
+                                            }
+                                            else{
+                                                cupomExiste = true;
+                                                JOptionPane.showMessageDialog(null, "Cancelando edição de cupom...");
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        JOptionPane.showMessageDialog(null, "Não há cupons para editar!");
+                                    }
+                                }
+                                case "3" -> {System.out.println(bancoCupons.toString());}
+                                case "4" -> {
+                                    if(!bancoCupons.estaVazio()){
+                                        boolean cupomExiste = false;
+                                        while(!cupomExiste){
+                                            String cupomid = JOptionPane.showInputDialog("Digite o ID do Cupom que deseja editar (ENTER para sair): ");
+                                            if(!cupomid.equals("")){
+                                                int cupomidINT = Integer.parseInt(cupomid);
+                                                if(bancoCupons.procurarCupomID(cupomidINT) != null){
+                                                    bancoCupons.removerCupom(cupomidINT);
+                                                    cupomExiste = true;
+                                                    JOptionPane.showMessageDialog(null, "Cupom removido com sucesso!");
+                                                }
+                                                else{
+                                                    JOptionPane.showMessageDialog(null, "O ID inserido não existe! Tente novamente");
+                                                }
+                                            }
+                                            else{
+                                                cupomExiste = true;
+                                                JOptionPane.showMessageDialog(null, "Cancelando remoção de cupom...");
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        JOptionPane.showMessageDialog(null, "Não há cupons a serem deletados!");
+                                    }
+                                }
+                                case "5" -> {sair = true;}
+                                default -> {JOptionPane.showMessageDialog(null, "Seleção inválida! Tente novamente.");}
+                            }
+                        }
                     }
                     case "2" -> {
                     }
                     case "3" -> {
-                    }
-                    case "4" -> {
-                    }
-                    case "5" -> {
                         boolean pararManejar = false;
                         while(!pararManejar){
                             
@@ -221,7 +491,7 @@ public class Tela_Usuarios {
                             }
                         }
                     }
-                    case "6" -> {
+                    case "4" -> {
                         String inputUsuarios = "";
                         
                         while(!inputUsuarios.equals("5")){
@@ -423,7 +693,7 @@ public class Tela_Usuarios {
                             }
                         }
                     }
-                    case "7" -> {
+                    case "5" -> {
                         String inputProdutos = "";
                         
                         while(!inputProdutos.equals("5")){
@@ -471,6 +741,7 @@ public class Tela_Usuarios {
                                                                 JOptionPane.showMessageDialog(null, "Insira um valor valido!");
                                                             } else {
                                                                 Produto novoProduto = new Produto(quantidadeInt, nome, descricao, precoD, calendario.getDataHoje(), bancoProdutos);
+                                                                Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(novoProduto.getId(), quantidadeInt, precoD, "Entrada", calendario.getDataHoje(), bancoMovimentacao_Estoque);
                                                             }
                                                         } else {
                                                             JOptionPane.showMessageDialog(null, "Cancelando criação de produto...");
@@ -530,6 +801,7 @@ public class Tela_Usuarios {
                                                                                 JOptionPane.showMessageDialog(null, "Quantidade alterada com sucesso!");
                                                                                 bancoProdutos.pesquisarProduto(idINT).setQuantidade(novaQuantidadeINT);
                                                                                 bancoProdutos.pesquisarProduto(idINT).setData_modificacao(calendario.getDataHoje());
+                                                                                Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(idINT, novaQuantidadeINT, bancoProdutos.pesquisarProduto(idINT).getPreco_venda(), "Ajuste", calendario.getDataHoje(), bancoMovimentacao_Estoque);
                                                                                 pararQuantidade = true;
                                                                                 pararAlteracao = true;
                                                                             }
@@ -626,6 +898,7 @@ public class Tela_Usuarios {
 
                                                 if(!opc.equals("")){
                                                     opcInt = Integer.parseInt(opc);
+                                                    Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(opcInt, bancoProdutos.pesquisarProduto(opcInt).getQuantidade(), bancoProdutos.pesquisarProduto(opcInt).getPreco_venda(), "Ajuste", calendario.getDataHoje(), bancoMovimentacao_Estoque);
                                                 }
                                                 else{
                                                     JOptionPane.showMessageDialog(null, "Cancelando exclusão de produto...");
@@ -643,7 +916,7 @@ public class Tela_Usuarios {
                             }
                         }
                     }
-                    case "8" -> {
+                    case "6" -> {
                         DateTimeFormatter dataDiaMesAno = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                                 
                         String novaData = JOptionPane.showInputDialog(
@@ -658,14 +931,17 @@ public class Tela_Usuarios {
                             JOptionPane.showMessageDialog(null, "Cancelando alteração de data do sistema...");
                         }
                     }
+                    case "7" -> {
+                        JOptionPane.showMessageDialog(null, bancoMovimentacao_Estoque.toString());
+                    }
+                    case "8" -> {
+                    }
                     case "9" -> {
                     }
                     case "10" -> {
-                    }
-                    case "11" -> {
                         
                     }
-                    case "12" -> {
+                    case "11" -> {
                         JOptionPane.showMessageDialog(null, "Deslogando...");
                     }
                     default ->
@@ -680,15 +956,15 @@ public class Tela_Usuarios {
                     + """
             1 - Manejar Carrinho
             2 - Ver Produtos à venda
-            3 - Relatório de Pedidos
-            4 - Deslogar
+            3 - Manejar Pedidos Criados          
+            4 - Relatório de Pedidos
+            5 - Deslogar
             """;
 
-            while (!inputPainelC.equals("4")) {
+            while (!inputPainelC.equals("5")) {
                 inputPainelC = JOptionPane.showInputDialog(painelCliente);
                 switch (inputPainelC) {
                     case "1" -> {
-                        //Ao finalizar gera um PEDIDO,  ITENS_PEDIDO e MOVIMENTACAO_ESTOQUE
                         boolean vazio = bancoCarrinhos.estaVazio(user.getId());
                         String resp = "";
                                     
@@ -759,7 +1035,88 @@ public class Tela_Usuarios {
                                             }
                                         }
                                     }
-                                    case "2" -> {}
+                                    case "2" -> {
+                                        boolean pararFinalização = false;
+                                        int id_cupom = 0;
+                                        double subTotal = bancoItens_Carrinho.subTotal(bancoCarrinhos.pesquisarCarrinho(user.getId()).getId());
+
+                                        while (!pararFinalização){
+                                            int opc = JOptionPane.showConfirmDialog(null, "Deseja adicionar um cupom?", "", JOptionPane.YES_NO_OPTION);
+
+                                            if (opc == 0) {
+                                                boolean pararCupom = false;
+                                                while (!pararCupom){
+                                                    String codigoCupom = JOptionPane.showInputDialog("""
+                                                                            Digite o código do cupom: (ENTER para sair)""");
+
+                                                    if (!codigoCupom.equals("")){
+                                                        if(bancoCupons.procurarCupomCODIGO(codigoCupom) != null && bancoCupons.procurarCupomCODIGO(codigoCupom).isAtivo() && bancoCupons.procurarCupomCODIGO(codigoCupom).getValor_minimo_pedido() <= subTotal){
+                                                            id_cupom = bancoCupons.procurarCupomCODIGO(codigoCupom).getId();
+                                                            pararCupom = true;
+                                                        } else {
+                                                            JOptionPane.showMessageDialog(null, "Insira um cupom válido!");
+                                                        }
+                                                    } else {
+                                                        JOptionPane.showMessageDialog(null, "Cancelando finalização do carrinho...");
+                                                        pararFinalização = true;
+                                                        pararCupom = true;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if (!pararFinalização){
+                                                boolean pararPagamento = false;
+                                                while (!pararPagamento){
+                                                    String formaPagamento = JOptionPane.showInputDialog("""
+                                                                            Qual vai ser a forma de pagamento? (ENTER para sair)
+
+                                                                            1 - Pix
+                                                                            2 - Cartão de crédito
+                                                                            3 - Cartão de débito
+                                                                            4 - Boleto
+                                                                            """);
+                                                    if (!formaPagamento.equals("")) {
+                                                        if (formaPagamento.equals("1") || formaPagamento.equals("2") || formaPagamento.equals("3") || formaPagamento.equals("4")){
+                                                            if(formaPagamento.equals("1")){
+                                                                formaPagamento = "Pix";
+                                                            }
+                                                            else if (formaPagamento.equals("2")){
+                                                                formaPagamento = "Cartão de crédito";
+                                                            }
+                                                            else if (formaPagamento.equals("3")){
+                                                                formaPagamento = "Cartão de débito";
+                                                            }
+                                                            else{
+                                                                formaPagamento = "Boleto";
+                                                            }
+                                                            if(id_cupom != 0){
+                                                                if (bancoCupons.procurarCupomID(id_cupom).getTipo_desconto() == "Fixo"){
+                                                                    subTotal -= bancoCupons.procurarCupomID(id_cupom).getValor_desconto();
+                                                                } else {
+                                                                    subTotal -= bancoCupons.procurarCupomID(id_cupom).getValor_desconto() * subTotal;
+                                                                }
+                                                            }
+                                                            Pedido novoPedido = new Pedido(user.getId(), id_cupom, subTotal, formaPagamento, calendario.getDataHoje(), bancoPedidos);
+                                                            bancoItens_Carrinho.criarItens_PedidoEmovimentar_Estoque(novoPedido.getId(), bancoCarrinhos.pesquisarCarrinho(user.getId()).getId(), bancoItens_Pedido, calendario.getDataHoje(), bancoMovimentacao_Estoque);
+                                                            bancoCarrinhos.pesquisarCarrinho(user.getId()).setData_modificacao(calendario.getDataHoje());
+                                                            bancoCarrinhos.pesquisarCarrinho(user.getId()).setStatus("Fechado");
+                                                            JOptionPane.showMessageDialog(null, "Compra Finalizada.");
+                                                            pararFinalização = true;
+                                                            pararPagamento = true;
+                                                            resp = "0";
+                                                        } else {
+                                                            JOptionPane.showMessageDialog(null, "Insira um valor válido!");
+                                                        }
+
+                                                    } else {
+                                                            JOptionPane.showMessageDialog(null, "Cancelando finalização do carrinho...");
+                                                            pararFinalização = true;
+                                                            pararPagamento = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                     case "3" -> {
                                         bancoProdutos.retornarProdutos(bancoCarrinhos, bancoItens_Carrinho, user.getId());
                                         bancoCarrinhos.pesquisarCarrinho(user.getId()).setData_modificacao(calendario.getDataHoje());
@@ -825,7 +1182,85 @@ public class Tela_Usuarios {
                                                                 pararCompra = true;
                                                             }
                                                             case 2 -> {
-                                                                //Gera um PEDIDO,  ITENS_PEDIDO e MOVIMENTACAO_ESTOQUE
+                                                                boolean pararFinalização = false;
+                                                                int id_cupom = 0;
+                                                                double subTotal = bancoProdutos.pesquisarProduto(idINT).getPreco_venda() * opcQuantidadeINT;
+                                                                bancoProdutos.pesquisarProduto(idINT).setQuantidade(bancoProdutos.pesquisarProduto(idINT).getQuantidade() - opcQuantidadeINT);
+
+                                                                while (!pararFinalização){
+                                                                    int opc = JOptionPane.showConfirmDialog(null, "Deseja adicionar um cupom?", "", JOptionPane.YES_NO_OPTION);
+
+                                                                    if (opc == 0) {
+                                                                        boolean pararCupom = false;
+                                                                        while (!pararCupom){
+                                                                            String codigoCupom = JOptionPane.showInputDialog("""
+                                                                                                    Digite o código do cupom: (ENTER para sair)""");
+
+                                                                            if (!codigoCupom.equals("")){
+                                                                                if(bancoCupons.procurarCupomCODIGO(codigoCupom) != null && bancoCupons.procurarCupomCODIGO(codigoCupom).isAtivo() && bancoCupons.procurarCupomCODIGO(codigoCupom).getValor_minimo_pedido() <= subTotal){
+                                                                                    id_cupom = bancoCupons.procurarCupomCODIGO(codigoCupom).getId();
+                                                                                    pararCupom = true;
+                                                                                } else {
+                                                                                    JOptionPane.showMessageDialog(null, "Insira um cupom válido!");
+                                                                                }
+                                                                            } else {
+                                                                                JOptionPane.showMessageDialog(null, "Cancelando finalização da compra...");
+                                                                                pararFinalização = true;
+                                                                                pararCupom = true;
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if (!pararFinalização){
+                                                                        boolean pararPagamento = false;
+                                                                        while (!pararPagamento){
+                                                                            String formaPagamento = JOptionPane.showInputDialog("""
+                                                                                                    Qual vai ser a forma de pagamento? (ENTER para sair)
+
+                                                                                                    1 - Pix
+                                                                                                    2 - Cartão de crédito
+                                                                                                    3 - Cartão de débito
+                                                                                                    4 - Boleto
+                                                                                                    """);
+                                                                            if (!formaPagamento.equals("")) {
+                                                                                if (formaPagamento.equals("1") || formaPagamento.equals("2") || formaPagamento.equals("3") || formaPagamento.equals("4")){
+                                                                                    if(formaPagamento.equals("1")){
+                                                                                        formaPagamento = "Pix";
+                                                                                    }
+                                                                                    else if (formaPagamento.equals("2")){
+                                                                                        formaPagamento = "Cartão de crédito";
+                                                                                    }
+                                                                                    else if (formaPagamento.equals("3")){
+                                                                                        formaPagamento = "Cartão de débito";
+                                                                                    }
+                                                                                    else{
+                                                                                        formaPagamento = "Boleto";
+                                                                                    }
+                                                                                    if(id_cupom != 0){
+                                                                                        if (bancoCupons.procurarCupomID(id_cupom).getTipo_desconto() == "Fixo"){
+                                                                                            subTotal -= bancoCupons.procurarCupomID(id_cupom).getValor_desconto();
+                                                                                        } else {
+                                                                                            subTotal -= bancoCupons.procurarCupomID(id_cupom).getValor_desconto() * subTotal;
+                                                                                        }
+                                                                                    }
+                                                                                    Pedido novoPedido = new Pedido(user.getId(), id_cupom, subTotal, formaPagamento, calendario.getDataHoje(), bancoPedidos);
+                                                                                    Itens_Pedido novoItens_Pedido = new Itens_Pedido(novoPedido.getId(), idINT, opcQuantidadeINT, bancoProdutos.pesquisarProduto(idINT).getPreco_venda(), calendario.getDataHoje(), bancoItens_Pedido);
+                                                                                    Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(idINT, opcQuantidadeINT, bancoProdutos.pesquisarProduto(idINT).getPreco_venda(), "Saída", calendario.getDataHoje(), bancoMovimentacao_Estoque);
+                                                                                    JOptionPane.showMessageDialog(null, "Compra Finalizada.");
+                                                                                    pararFinalização = true;
+                                                                                    pararPagamento = true;
+                                                                                } else {
+                                                                                    JOptionPane.showMessageDialog(null, "Insira um valor válido!");
+                                                                                }
+
+                                                                            } else {
+                                                                                    JOptionPane.showMessageDialog(null, "Cancelando finalização da compra...");
+                                                                                    pararFinalização = true;
+                                                                                    pararPagamento = true;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
                                                                 pararCompra = true;
                                                             }
                                                             default ->
@@ -857,8 +1292,12 @@ public class Tela_Usuarios {
                         
                     }
                     case "3" -> {
+                        
                     }
-                    case "4" -> {JOptionPane.showMessageDialog(null, "Deslogando..");}
+                    case "4" -> {
+                        JOptionPane.showMessageDialog(null, bancoPedidos.toString(1, user.getId()));
+                    }
+                    case "5" -> {JOptionPane.showMessageDialog(null, "Deslogando..");}
                     default ->
                         JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
                 }

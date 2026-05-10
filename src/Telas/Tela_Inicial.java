@@ -8,14 +8,22 @@ import Classes.Administrador;
 import Classes.Carrinho;
 import Classes.Cliente;
 import Classes.Itens_Carrinho;
+import Classes.Pedido;
 import DAOs.PessoaDAO;
 import Classes.Pessoa;
 import Classes.Produto;
 import Classes.Usuario;
+import Classes.Cupom;
+import Classes.Itens_Pedido;
+import Classes.Movimentacao_Estoque;
+import DAOs.CuponsDAO;
 import DAOs.ProdutosDAO;
 import DAOs.UsuarioDAO;
 import DAOs.CarrinhoDAO;
 import DAOs.Itens_CarrinhoDAO;
+import DAOs.Itens_PedidoDAO;
+import DAOs.Movimentacao_EstoqueDAO;
+import DAOs.PedidosDAO;
 import Sistema.Calendario;
 import java.time.LocalDate;
 import java.time.Month;
@@ -35,6 +43,10 @@ public class Tela_Inicial {
         ProdutosDAO bancoProdutos = new ProdutosDAO(new Produto[100]);
         CarrinhoDAO bancoCarrinhos = new CarrinhoDAO(new Carrinho[100]);
         Itens_CarrinhoDAO bancoItens_Carrinho = new Itens_CarrinhoDAO(new Itens_Carrinho[100]);
+        PedidosDAO bancoPedidos = new PedidosDAO(new Pedido[100]);
+        CuponsDAO bancoCupons = new CuponsDAO(new Cupom[100]);
+        Itens_PedidoDAO bancoItens_Pedido = new Itens_PedidoDAO(new Itens_Pedido[100]);
+        Movimentacao_EstoqueDAO bancoMovimentacao_Estoque = new Movimentacao_EstoqueDAO(new Movimentacao_Estoque[100]);
         
         //CRIANDO PESSOAS ADMIN
         Pessoa pessoaAdmin1 = new Pessoa("Eduardo Borges Pereira", LocalDate.of(2007, Month.JANUARY, 22), "185.824.286-00", sistemaCalendario.getDataHoje(), bancoPessoas);
@@ -57,6 +69,10 @@ public class Tela_Inicial {
         //CRIANDO PRODUTOS
         Produto produto1 = new Produto(10, "a", "a", 10.10, sistemaCalendario.getDataHoje(), bancoProdutos);
         Produto produto2 = new Produto(20, "b", "b", 20.20, sistemaCalendario.getDataHoje(), bancoProdutos);
+        
+        //CRIANDO CUPONS
+        Cupom cupom1 = new Cupom("1", "Fixo", 2, 15, LocalDate.of(2026, Month.JUNE, 11), sistemaCalendario.getDataHoje(), bancoCupons);
+        Cupom cupom2 = new Cupom("2", "Percentual", 0.10, 8, LocalDate.of(2026, Month.JUNE, 10), sistemaCalendario.getDataHoje(), bancoCupons);
         
         String resp = "";
         String menu_I = """
@@ -108,7 +124,7 @@ public class Tela_Inicial {
 
                             if (bancoUsuarios.senhaExistente(inputSenha)) {
                                 JOptionPane.showMessageDialog(null, "Login efetuado com sucesso!");
-                                Tela_Usuarios.main(bancoUsuarios.UsuárioLogin(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos, bancoItens_Carrinho);
+                                Tela_Usuarios.main(bancoUsuarios.UsuárioLogin(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos, bancoItens_Carrinho, bancoPedidos, bancoCupons, bancoItens_Pedido, bancoMovimentacao_Estoque);
                                 sair = true;
                             } else if (inputSenha.equals("")) {
                                 JOptionPane.showMessageDialog(null, "Cancelando o login...");

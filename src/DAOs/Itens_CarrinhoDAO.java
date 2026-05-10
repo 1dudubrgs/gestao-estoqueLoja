@@ -5,6 +5,9 @@
 package DAOs;
 
 import Classes.Itens_Carrinho;
+import Classes.Itens_Pedido;
+import Classes.Movimentacao_Estoque;
+import java.time.LocalDate;
 
 /**
  *
@@ -58,6 +61,25 @@ public class Itens_CarrinhoDAO {
             }
         }
         return false;
+    }
+    
+    public double subTotal(int id_carrinho){
+        double subtotal = 0;
+        for (Itens_Carrinho index : this.listaItens_Carrinho) {
+            if (index != null && index.getId_carrinho() == id_carrinho) {
+               subtotal += index.getPreco_unitario() * index.getQuantidade();
+            }
+        }
+        return subtotal;
+    }
+    
+    public void criarItens_PedidoEmovimentar_Estoque(int id_pedido, int id_carrinho, Itens_PedidoDAO bancoItens_Pedido, LocalDate data_criacao, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque){
+        for (Itens_Carrinho index : this.listaItens_Carrinho) {
+            if (index != null && index.getId_carrinho() == id_carrinho) {
+                Itens_Pedido novoItens_Pedido = new Itens_Pedido(id_pedido, index.getId_produto(), index.getQuantidade(), index.getPreco_unitario(), data_criacao, bancoItens_Pedido);
+                Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(index.getId_produto(), index.getQuantidade(), index.getPreco_unitario(), "Saída", data_criacao, bancoMovimentacao_Estoque);
+            }
+        }
     }
     
     public Itens_Carrinho pesquisarItens_Carrinho(int id_produto, int id_carrinho){
