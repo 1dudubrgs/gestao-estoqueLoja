@@ -111,9 +111,10 @@ public class CarrinhoDAO {
         }
     }
     
-    public void expirarCarrinhos(LocalDate dataSistema){
+    public void expirarCarrinhos(LocalDate dataSistema, ProdutosDAO bancoProdutos, Itens_CarrinhoDAO bancoItens_Carrinho, Movimentacao_EstoqueDAO bancoMovientacao_Estoque){
         for(int i = 0; i<this.listaCarrinhos.length; i++){
             if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getStatus().equals("Aberto") && this.listaCarrinhos[i].getData_criacao().isBefore(dataSistema)){
+                bancoProdutos.retornarProdutosdoCarrinho(this, bancoItens_Carrinho, this.listaCarrinhos[i].getId_usuario(), dataSistema, bancoMovientacao_Estoque);
                 this.listaCarrinhos[i].setStatus("Expirado");
                 this.listaCarrinhos[i].setData_modificacao(dataSistema);
             }

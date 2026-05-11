@@ -59,13 +59,30 @@ public class EntregasDAO {
         
         return null;
     }
-
+    
+    public Entregas procurarEntregaPedidoID(int ID){
+        for(int i = 0; i<this.listaEntregas.length; i++){
+            if(this.listaEntregas[i] != null && this.listaEntregas[i].getId_pedido() == ID){
+                return this.listaEntregas[i];
+            }
+        }
+        
+        return null;
+    }
+    
     @Override
     public String toString() {
+        String retornar = "";
+        
         if(this.estaVazio()){
             return "Não há entregas para listar!";
         }
         
-        return "Entregas encontradas no sistema:\n\n" + listaEntregas;
+        for (Entregas index : listaEntregas) {
+            if(index != null)
+                retornar += index + "\n\n"; 
+        }
+        
+        return "Entregas encontradas no sistema:\n\n" + retornar;
     }
 }

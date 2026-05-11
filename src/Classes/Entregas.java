@@ -16,7 +16,7 @@ import java.util.Objects;
 public class Entregas {
     private int id;
     private int id_pedido;
-    private String status; //preparando, enviado, em_transito, entregue, cancelada
+    private String status; //preparando, enviado, entregue, cancelada
     private String transportadora;
     private int codigo_rastreio;
     private LocalDate data_envio;
@@ -125,6 +125,11 @@ public class Entregas {
     @Override
     public String toString() {
         DateTimeFormatter dma = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return "ID = " + id + "\nID Pedido = " + id_pedido + "\nStatus = " + status + "\nTransportadora = " + transportadora + "\nCódigo Rastreio = " + codigo_rastreio + "\nData de envio = " + data_envio.format(dma) + "\nData de entrega = " + data_entrega.format(dma) + "\nData de criação = " + data_criacao.format(dma) + "\nData de modificacao = " + data_modificacao.format(dma);
+        if(this.data_entrega == null && this.data_envio == null)
+            return "ID = " + id + "\nID Pedido = " + id_pedido + "\nStatus = " + status + "\nTransportadora = " + transportadora + "\nCódigo Rastreio = " + codigo_rastreio + "\nData de envio = " + "Não foi enviado" + "\nData de entrega = " + "Não foi entregue" + "\nData de criação = " + data_criacao.format(dma) + "\nData de modificacao = " + data_modificacao.format(dma);
+        else if(this.data_entrega == null && this.data_envio != null)
+            return "ID = " + id + "\nID Pedido = " + id_pedido + "\nStatus = " + status + "\nTransportadora = " + transportadora + "\nCódigo Rastreio = " + codigo_rastreio + "\nData de envio = " + data_envio.format(dma) + "\nData de entrega = " + "Não foi entregue" + "\nData de criação = " + data_criacao.format(dma) + "\nData de modificacao = " + data_modificacao.format(dma);
+        else
+            return "ID = " + id + "\nID Pedido = " + id_pedido + "\nStatus = " + status + "\nTransportadora = " + transportadora + "\nCódigo Rastreio = " + codigo_rastreio + "\nData de envio = " + data_envio.format(dma) + "\nData de entrega = " + data_entrega.format(dma) + "\nData de criação = " + data_criacao.format(dma) + "\nData de modificacao = " + data_modificacao.format(dma);
     }
 }

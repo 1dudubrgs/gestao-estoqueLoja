@@ -89,7 +89,7 @@ public class Tela_Inicial {
         //CRIANDO PEDIDOS
         Pedido pedido1 = new Pedido(3, 1, 20, "Pix", sistemaCalendario.getDataHoje(), bancoPedidos);
         Pedido pedido2 = new Pedido(3, 2, 10, "Boleto", sistemaCalendario.getDataHoje(), bancoPedidos);
-        Pedido pedido3 = new Pedido(2, 1, 40.60, "Cartão de Crédito", sistemaCalendario.getDataHoje(), bancoPedidos);
+        Pedido pedido3 = new Pedido(4, 1, 40.60, "Cartão de Crédito", sistemaCalendario.getDataHoje(), bancoPedidos);
         
         //CRIANDO ITENS_PEDIDO
         Itens_Pedido itensPedido1 = new Itens_Pedido(1, 1, 2, 10.00, sistemaCalendario.getDataHoje(), bancoItens_Pedido);

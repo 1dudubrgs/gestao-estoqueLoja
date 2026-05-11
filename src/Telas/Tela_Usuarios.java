@@ -6,6 +6,7 @@ import Classes.Pessoa;
 import Classes.Itens_Carrinho;
 import Classes.Pedido;
 import Classes.Cupom;
+import Classes.Entregas;
 import Classes.Itens_Pedido;
 import Classes.Movimentacao_Estoque;
 import Classes.Produto;
@@ -956,7 +957,34 @@ public class Tela_Usuarios {
                                 }
                                 case "2" -> {
                                     if(!bancoEntregas.estaVazio()){
-                                    
+                                        boolean sairCancelar = false;
+                                        while(!sairCancelar){
+                                            String idEntrega = JOptionPane.showInputDialog("Digite o ID da Entrega que deseja cancelar (ENTER para sair): ");
+                                            if(!idEntrega.equals("")){
+                                                int idEntregaINT = Integer.parseInt(idEntrega);
+                                                Entregas entrega = bancoEntregas.procurarEntregaID(idEntregaINT);
+                                                if(entrega != null && entrega.getStatus().equals("Preparando")){
+                                                    bancoProdutos.retornarProdutosdoPedido(bancoPedidos, bancoItens_Pedido, calendario.getDataHoje(), bancoMovimentacao_Estoque, bancoEntregas.procurarEntregaID(idEntregaINT).getId_pedido());
+                                                    entrega.setStatus("Cancelado");
+                                                    bancoPedidos.pesquisarPedido(entrega.getId_pedido()).setStatus("Cancelado");
+                                                    sairCancelar = true;
+                                                    JOptionPane.showMessageDialog(null, "Entrega cancelada com sucesso!");
+                                                }
+                                                else if(entrega.getStatus().equals("Enviado")){
+                                                    JOptionPane.showMessageDialog(null, "Esta entrega já foi enviada! Tente novamente.");
+                                                }
+                                                else if(entrega.getStatus().equals("Cancelado")){
+                                                    JOptionPane.showMessageDialog(null, "Esta entrega já foi cancelada! Tente novamente.");
+                                                }
+                                                else{
+                                                    JOptionPane.showMessageDialog(null, "ID não encontrado! Tente novamente.");
+                                                }
+                                            }
+                                            else{
+                                                sairCancelar = true;
+                                                JOptionPane.showMessageDialog(null, "Cancelando cancelamento de entrega...");
+                                            }
+                                        }
                                     }
                                     else{
                                         JOptionPane.showMessageDialog(null, "Não há entregas para cancelar!");
@@ -979,8 +1007,8 @@ public class Tela_Usuarios {
                             LocalDate novaDataSistema = LocalDate.parse(novaData, dataDiaMesAno);
 
                             calendario.setDataHoje(novaDataSistema);
-                            bancoCarrinhos.expirarCarrinhos(calendario.getDataHoje());
-                            bancoPedidos.statusEnviadoOuEntregue(calendario.getDataHoje());
+                            bancoCarrinhos.expirarCarrinhos(calendario.getDataHoje(), bancoProdutos, bancoItens_Carrinho, bancoMovimentacao_Estoque);
+                            bancoPedidos.statusEnviadoOuEntregue(calendario.getDataHoje(), bancoEntregas);
                             
                             JOptionPane.showMessageDialog(null, "Data alterada com sucesso!");
                         }
@@ -994,7 +1022,48 @@ public class Tela_Usuarios {
                     case "9" -> {
                         System.out.println(bancoCarrinhos.toString());
                     }
-                    case "10" -> {}
+                    case "10" -> {
+                        if(!bancoPedidos.estaVazio()){
+                            DateTimeFormatter dma = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            String msg = """
+                                         1 - Período
+                                         2 - Clientes
+                                         3 - Status
+                                         4 - Sair
+                                         """ + "\n";
+                            
+                            boolean sair = false;
+                            while(!sair){
+                                String opcoes = JOptionPane.showInputDialog("Digite uma das opções abaixo:\n\n" + msg);
+                                switch (opcoes) {
+                                    case "1" -> {
+                                        String inicio = JOptionPane.showInputDialog("Digite o inicio do período (ENTER para sair):");
+                                        if(!inicio.equals("")){
+                                            String fim = JOptionPane.showInputDialog("Digite o fim do período (ENTER para sair):");
+                                            if(!fim.equals("")){
+                                                LocalDate inicioDATE = LocalDate.parse(inicio, dma);
+                                                LocalDate fimDATE = LocalDate.parse(fim, dma);
+                                                JOptionPane.showMessageDialog(null, "Foram registradas " + bancoPedidos.vendasPeriodo(inicioDATE, fimDATE) + " vendas no período de tempo inserido.");
+                                            }
+                                            else{
+                                                JOptionPane.showMessageDialog(null, "Cancelando relatório de vendas por período...");
+                                            }
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Cancelando relatório de vendas por período...");
+                                        }
+                                    }
+                                    case "2" -> {JOptionPane.showMessageDialog(null, bancoPedidos.vendasCliente());}
+                                    case "3" -> {JOptionPane.showMessageDialog(null, bancoPedidos.vendasStatus());}
+                                    case "4" -> {sair = true;}
+                                    default -> JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
+                                }
+                            }
+                        }   
+                        else{
+                            JOptionPane.showMessageDialog(null, "Não foi gerado nenhum pedido para relatar as vendas!");
+                        }
+                    }
                     case "11" -> {
                         boolean vazio = bancoPedidos.estaVazio(0);
                         String resp = "";
@@ -1425,10 +1494,11 @@ public class Tela_Usuarios {
                                             String id = JOptionPane.showInputDialog(null, bancoPedidos.toString(1, user.getId(), 1) + "\n\nDigite o ID do pedido que deseja pagar (ENTER para sair)");
                                             if (!id.equals("")) {
                                                 int idINT = Integer.parseInt(id);
-                                                if (bancoPedidos.pesquisarPedido(idINT) != null && bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Criado")) {
+                                                if (bancoPedidos.pesquisarPedido(idINT) != null && bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Criado") && bancoPedidos.pesquisarPedido(idINT).getId_usuario() == user.getId()) {
                                                     pararID = true;
                                                     bancoPedidos.pesquisarPedido(idINT).setStatus("Pago");
                                                     bancoPedidos.pesquisarPedido(idINT).setData_modificacao(calendario.getDataHoje());
+                                                    Entregas novaEntrega = new Entregas(idINT, "Loggi", calendario.getDataHoje(), bancoEntregas);
                                                     JOptionPane.showMessageDialog(null, "Pedido Pago com sucesso.");
                                                     if(bancoPedidos.estaVazio(user.getId())){
                                                         resp = "0";
@@ -1449,7 +1519,7 @@ public class Tela_Usuarios {
                                             String id = JOptionPane.showInputDialog(null, bancoPedidos.toString(1, user.getId(), 1) + "\n\nDigite o ID do pedido que deseja cancelar (ENTER para sair)");
                                             if (!id.equals("")) {
                                                 int idINT = Integer.parseInt(id);
-                                                if (bancoPedidos.pesquisarPedido(idINT) != null && (bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Criado") || bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Pago"))) {
+                                                if (bancoPedidos.pesquisarPedido(idINT) != null && (bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Criado") || bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Pago")) && bancoPedidos.pesquisarPedido(idINT).getId_usuario() == user.getId()) {
                                                     pararID = true;
                                                     bancoProdutos.retornarProdutosdoPedido(bancoPedidos, bancoItens_Pedido, calendario.getDataHoje(), bancoMovimentacao_Estoque, idINT);
                                                     bancoPedidos.pesquisarPedido(idINT).setStatus("Cancelado");

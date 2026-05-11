@@ -140,15 +140,21 @@ public class PedidosDAO {
         return null;
     }
     
-    public void statusEnviadoOuEntregue(LocalDate dataSistema){
+    public void statusEnviadoOuEntregue(LocalDate dataSistema, EntregasDAO bancoEntregas){
         for(int i = 0; i<this.listaPedidos.length; i++){
             if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Pago") && this.listaPedidos[i].getData_criacao().isBefore(dataSistema)){
                 this.listaPedidos[i].setStatus("Enviado");
                 this.listaPedidos[i].setData_modificacao(dataSistema);
+                bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_envio(dataSistema);
+                bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_modificacao(dataSistema);
+                bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setStatus("Enviado");
             }
             else if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Enviado") && this.listaPedidos[i].getData_criacao().isBefore(dataSistema)){
                 this.listaPedidos[i].setStatus("Entregue");
                 this.listaPedidos[i].setData_modificacao(dataSistema);
+                bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_entrega(dataSistema);
+                bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_modificacao(dataSistema);
+                bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setStatus("Entregue");
             }
         }
     }
@@ -231,7 +237,7 @@ public class PedidosDAO {
                             soma += this.listaPedidos[i3].getValor_total();
                         }
                     }
-                    relatorio += this.listaPedidos[i].getData_modificacao().getMonthValue() + "\nR$: " + soma + "\n\n";
+                    relatorio += "Mês " + this.listaPedidos[i].getData_modificacao().getMonthValue() + ":\nR$: " + soma + "\n\n";
                     soma = 0.0;
                     mesesUsados[contMesesUsados++] = this.listaPedidos[i].getData_modificacao().getMonthValue();
                 }
@@ -242,17 +248,18 @@ public class PedidosDAO {
     }
     
     public String faturamentoDiario(){
+        DateTimeFormatter dma = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         String relatorio = "";
         double soma = 0.0;
-        int contMesesUsados = 0;
-        int[] mesesUsados = new int[100];
+        int contDiasUsados = 0;
+        LocalDate[] diasUsados = new LocalDate[100];
         boolean jaFoiContado = false;
         
         for(int i = 0; i<this.listaPedidos.length; i++){
             if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue"))){
                 
-                for(int i2 = 0; i2<contMesesUsados; i2++){
-                    if(this.listaPedidos[i].getData_modificacao().getMonthValue()== mesesUsados[i2]){
+                for(int i2 = 0; i2<contDiasUsados; i2++){
+                    if(this.listaPedidos[i].getData_modificacao()== diasUsados[i2]){
                         jaFoiContado = true;
                     }
                 }
@@ -263,18 +270,105 @@ public class PedidosDAO {
                         if(this.listaPedidos[i3] != null 
                            && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue")) 
                            && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
-                           && this.listaPedidos[i3].getData_modificacao().getMonthValue() == this.listaPedidos[i].getData_modificacao().getMonthValue())
+                           && this.listaPedidos[i3].getData_modificacao() == this.listaPedidos[i].getData_modificacao())
                         {
                             soma += this.listaPedidos[i3].getValor_total();
                         }
                     }
-                    relatorio += this.listaPedidos[i].getData_modificacao().getMonthValue() + "\nR$: " + soma + "\n\n";
+                    relatorio += this.listaPedidos[i].getData_modificacao().format(dma) + "\nR$: " + soma + "\n\n";
                     soma = 0.0;
-                    mesesUsados[contMesesUsados++] = this.listaPedidos[i].getData_modificacao().getMonthValue();
+                    diasUsados[contDiasUsados++] = this.listaPedidos[i].getData_modificacao();
                 }
             }
             jaFoiContado = false;
         }
         return relatorio;
+    }
+    
+    public int vendasPeriodo(LocalDate inicio, LocalDate fim){
+        int quantasVendas = 0;
+        
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue") || this.listaPedidos[i].getStatus().equals("Pago"))){
+                if(this.listaPedidos[i].getData_modificacao().isAfter(inicio) && this.listaPedidos[i].getData_modificacao().isBefore(fim)){
+                    quantasVendas++;
+                }
+            }
+        }
+        return quantasVendas;
+    }
+
+    public String vendasCliente(){
+        String vendas = "";
+        int quantasVendas = 0;
+        int contClientesContados = 0;
+        int[] clientesContadosID = new int[100];
+        boolean jaFoiContado = false;
+        
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue") || this.listaPedidos[i].getStatus().equals("Pago"))){
+                
+                for(int i2 = 0; i2<contClientesContados; i2++){
+                    if(this.listaPedidos[i].getId_usuario() == clientesContadosID[i2]){
+                        jaFoiContado = true;
+                    }
+                }
+                
+                if(!jaFoiContado){
+                    quantasVendas++;
+                    for(int i3 = 0; i3<this.listaPedidos.length; i3++){
+                        if(this.listaPedidos[i3] != null 
+                        && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue") || this.listaPedidos[i].getStatus().equals("Pago")) 
+                        && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
+                        && this.listaPedidos[i3].getId_usuario()== this.listaPedidos[i].getId_usuario())
+                        {
+                            quantasVendas++;
+                        }
+                    }
+                    vendas += "ID do Usuário (Cliente): " + this.listaPedidos[i].getId_usuario() + "\n" + quantasVendas + "\n\n";
+                    quantasVendas = 0;
+                    clientesContadosID[contClientesContados++] = this.listaPedidos[i].getId_usuario();
+                }
+            }
+            jaFoiContado = false;
+        }
+        return vendas;
+    }
+
+    public String vendasStatus(){
+        String vendas = "";
+        int quantasVendas = 0;
+        int contClientesContados = 0;
+        String[] clientesContadosSTATUS = new String[100];
+        boolean jaFoiContado = false;
+        
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue") || this.listaPedidos[i].getStatus().equals("Pago"))){
+                
+                for(int i2 = 0; i2<contClientesContados; i2++){
+                    if(this.listaPedidos[i].getStatus().equals(clientesContadosSTATUS[i2])){
+                        jaFoiContado = true;
+                    }
+                }
+                
+                if(!jaFoiContado){
+                    quantasVendas++;
+                    for(int i3 = 0; i3<this.listaPedidos.length; i3++){
+                        if(this.listaPedidos[i3] != null 
+                        && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue") || this.listaPedidos[i].getStatus().equals("Pago")) 
+                        && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
+                        && this.listaPedidos[i3].getStatus().equals(this.listaPedidos[i].getStatus()))
+                        {
+                            quantasVendas++;
+                        }
+                    }
+                    vendas += this.listaPedidos[i].getStatus() + ":\n" + quantasVendas + "\n\n";
+                    quantasVendas = 0;
+                    clientesContadosSTATUS[contClientesContados++] = this.listaPedidos[i].getStatus();
+                }
+            }
+            jaFoiContado = false;
+        }
+        return vendas;
     }
 }

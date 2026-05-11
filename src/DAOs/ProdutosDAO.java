@@ -116,7 +116,7 @@ public class ProdutosDAO {
     
     public void retornarProdutosdoCarrinho(CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, int id_usuario, LocalDate data_criacao, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque){
         for (Produto listaProduto : this.listaProdutos) {
-            if (listaProduto != null && bancoItens_Carrinho.jaExiste(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId())) {
+            if (listaProduto != null && bancoCarrinhos.pesquisarCarrinho(id_usuario) != null && bancoItens_Carrinho.jaExiste(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId())) {
                 this.pesquisarProduto(listaProduto.getId()).setQuantidade(this.pesquisarProduto(listaProduto.getId()).getQuantidade() + bancoItens_Carrinho.pesquisarItens_Carrinho(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId()).getQuantidade());
                 Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(listaProduto.getId(), bancoItens_Carrinho.pesquisarItens_Carrinho(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId()).getQuantidade(), listaProduto.getPreco_venda(), "Entrada", data_criacao, bancoMovimentacao_Estoque);
             }
