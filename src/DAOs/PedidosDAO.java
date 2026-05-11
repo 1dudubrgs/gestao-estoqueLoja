@@ -5,6 +5,9 @@
 package DAOs;
 
 import Classes.Pedido;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -26,10 +29,12 @@ public class PedidosDAO {
         }
     }
     
-    public String toString(int num, int id_usuario) {
+    public String toString(int num, int id_usuario, int num2) {
         String string = "Pedidos registrados no Sistema:\n\n";
         int cont = 0;
         int aux = 0;
+        int aux2 = 0;
+        int aux3 = 0;
         
         for (Pedido index : listaPedidos) {
             if(index == null)
@@ -37,17 +42,239 @@ public class PedidosDAO {
             if(index != null && index.getId_usuario() == id_usuario){
                 aux = 1;
             }
-        }
-           
-        if(cont != this.listaPedidos.length && aux == 1){
-            for (Pedido index : listaPedidos) {
-                if(index != null && index.getId_usuario() == id_usuario)
-                    string += index.toString(num) + "\n\n"; 
+            if(index != null && index.getId_usuario() == id_usuario && ("Criado".equals(index.getStatus()) || "Pago".equals(index.getStatus()))){
+                aux2 = 1;
+            }
+            if(index != null && "Criado".equals(index.getStatus()) && num2 == 10){
+                aux3 = 1;
+            }
+            if(index != null && "Pago".equals(index.getStatus()) && num2 == 20){
+                aux3 = 2;
+            }
+            if(index != null && "Cancelado".equals(index.getStatus()) && num2 == 30){
+                aux3 = 3;
             }
         }
-        else
-            string += "Não há pedidos feitos!";
+        if(id_usuario == 0){
+            
+            if(cont != this.listaPedidos.length && aux3 == 1){
+                for (Pedido index : listaPedidos) {
+                    if(index != null && "Criado".equals(index.getStatus()))
+                        string += index.toString(num) + "\n\n";
+                }
+            }
+            else if(cont != this.listaPedidos.length && aux3 == 2){
+                for (Pedido index : listaPedidos) {
+                    if(index != null && "Pago".equals(index.getStatus()))
+                        string += index.toString(num) + "\n\n";
+                }
+            }
+            else if(cont != this.listaPedidos.length && aux3 == 3){
+                for (Pedido index : listaPedidos) {
+                    if(index != null && "Cancelado".equals(index.getStatus()))
+                        string += index.toString(num) + "\n\n";
+                }
+            }
+            else if(cont != this.listaPedidos.length && num2 == 0){
+                for (Pedido index : listaPedidos) {
+                    if(index != null)
+                        string += index.toString(num) + "\n\n"; 
+                }
+            }
+            else{
+                string += "Não há pedidos feitos!";
+            }
+        }
+        else if(num2 == 0){
+            if(cont != this.listaPedidos.length && aux == 1){
+                for (Pedido index : listaPedidos) {
+                    if(index != null && index.getId_usuario() == id_usuario)
+                        string += index.toString(num) + "\n\n"; 
+                }
+            }
+            else{
+                string += "Não há pedidos feitos!";
+            }
+            } else{
+            if(cont != this.listaPedidos.length && aux == 1 && aux2 == 1){
+                for (Pedido index : listaPedidos) {
+                    if(index != null && index.getId_usuario() == id_usuario && ("Criado".equals(index.getStatus()) || "Pago".equals(index.getStatus())))
+                        string += index.toString(num) + "\n\n";
+                }
+            }
+            else{
+                string += "Não há pedidos criados!";
+            }
+        }
         
         return string;
+    }
+    
+    public boolean estaVazio(int id_usuario){
+        int cont = 0;
+        int aux = 0;
+        for (Pedido listaPedido : this.listaPedidos) {
+            if (listaPedido == null) {
+                cont++;
+            }
+            if (listaPedido != null && listaPedido.getId_usuario() == id_usuario && "Criado".equals(listaPedido.getStatus())) {
+                aux = 1;
+            }
+        }
+        
+        if(cont != this.listaPedidos.length && id_usuario == 0)
+            return false;
+        
+        if(cont == this.listaPedidos.length || aux == 0)
+            return true;
+        
+        return false;
+    }
+    
+    public Pedido pesquisarPedido(int id_pedido){
+        for (Pedido listaPedidos : this.listaPedidos) {
+            if (listaPedidos != null && listaPedidos.getId() == id_pedido) {
+                return listaPedidos;
+            }
+        }
+        return null;
+    }
+    
+    public void statusEnviadoOuEntregue(LocalDate dataSistema){
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Pago") && this.listaPedidos[i].getData_criacao().isBefore(dataSistema)){
+                this.listaPedidos[i].setStatus("Enviado");
+                this.listaPedidos[i].setData_modificacao(dataSistema);
+            }
+            else if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Enviado") && this.listaPedidos[i].getData_criacao().isBefore(dataSistema)){
+                this.listaPedidos[i].setStatus("Entregue");
+                this.listaPedidos[i].setData_modificacao(dataSistema);
+            }
+        }
+    }
+    
+    public boolean estaVazio(){
+        int cont = 0;
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] == null){
+                cont++;
+            }
+        }
+        
+        if(cont == this.listaPedidos.length)
+            return true;
+        
+        return false;
+    }
+    
+    public String faturamentoAnual(){
+        String relatorio = "";
+        double soma = 0.0;
+        int contAnosUsados = 0;
+        int[] anosUsados = new int[100];
+        boolean jaFoiContado = false;
+        
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue"))){
+                
+                for(int i2 = 0; i2<contAnosUsados; i2++){
+                    if(this.listaPedidos[i].getData_modificacao().getYear() == anosUsados[i2]){
+                        jaFoiContado = true;
+                    }
+                }
+                
+                if(!jaFoiContado){
+                    soma += this.listaPedidos[i].getValor_total();
+                    for(int i3 = 0; i3<this.listaPedidos.length; i3++){
+                        if(this.listaPedidos[i3] != null 
+                           && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue")) 
+                           && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
+                           && this.listaPedidos[i3].getData_modificacao().getYear() == this.listaPedidos[i].getData_modificacao().getYear())
+                        {
+                            soma += this.listaPedidos[i3].getValor_total();
+                        }
+                    }
+                    relatorio += this.listaPedidos[i].getData_modificacao().getYear() + "\nR$: " + soma + "\n\n";
+                    soma = 0.0;
+                    anosUsados[contAnosUsados++] = this.listaPedidos[i].getData_modificacao().getYear();
+                }
+            }
+            jaFoiContado = false;
+        }
+        return relatorio;
+    }
+    
+    public String faturamentoMensal(){
+        String relatorio = "";
+        double soma = 0.0;
+        int contMesesUsados = 0;
+        int[] mesesUsados = new int[100];
+        boolean jaFoiContado = false;
+        
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue"))){
+                
+                for(int i2 = 0; i2<contMesesUsados; i2++){
+                    if(this.listaPedidos[i].getData_modificacao().getMonthValue()== mesesUsados[i2]){
+                        jaFoiContado = true;
+                    }
+                }
+                
+                if(!jaFoiContado){
+                    soma += this.listaPedidos[i].getValor_total();
+                    for(int i3 = 0; i3<this.listaPedidos.length; i3++){
+                        if(this.listaPedidos[i3] != null 
+                           && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue")) 
+                           && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
+                           && this.listaPedidos[i3].getData_modificacao().getMonthValue() == this.listaPedidos[i].getData_modificacao().getMonthValue())
+                        {
+                            soma += this.listaPedidos[i3].getValor_total();
+                        }
+                    }
+                    relatorio += this.listaPedidos[i].getData_modificacao().getMonthValue() + "\nR$: " + soma + "\n\n";
+                    soma = 0.0;
+                    mesesUsados[contMesesUsados++] = this.listaPedidos[i].getData_modificacao().getMonthValue();
+                }
+            }
+            jaFoiContado = false;
+        }
+        return relatorio;
+    }
+    
+    public String faturamentoDiario(){
+        String relatorio = "";
+        double soma = 0.0;
+        int contMesesUsados = 0;
+        int[] mesesUsados = new int[100];
+        boolean jaFoiContado = false;
+        
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue"))){
+                
+                for(int i2 = 0; i2<contMesesUsados; i2++){
+                    if(this.listaPedidos[i].getData_modificacao().getMonthValue()== mesesUsados[i2]){
+                        jaFoiContado = true;
+                    }
+                }
+                
+                if(!jaFoiContado){
+                    soma += this.listaPedidos[i].getValor_total();
+                    for(int i3 = 0; i3<this.listaPedidos.length; i3++){
+                        if(this.listaPedidos[i3] != null 
+                           && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue")) 
+                           && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
+                           && this.listaPedidos[i3].getData_modificacao().getMonthValue() == this.listaPedidos[i].getData_modificacao().getMonthValue())
+                        {
+                            soma += this.listaPedidos[i3].getValor_total();
+                        }
+                    }
+                    relatorio += this.listaPedidos[i].getData_modificacao().getMonthValue() + "\nR$: " + soma + "\n\n";
+                    soma = 0.0;
+                    mesesUsados[contMesesUsados++] = this.listaPedidos[i].getData_modificacao().getMonthValue();
+                }
+            }
+            jaFoiContado = false;
+        }
+        return relatorio;
     }
 }

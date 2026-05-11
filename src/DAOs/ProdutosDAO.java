@@ -4,7 +4,9 @@
  */
 package DAOs;
 
+import Classes.Movimentacao_Estoque;
 import Classes.Produto;
+import java.time.LocalDate;
 import java.util.Arrays;
 import javax.swing.JOptionPane;
 
@@ -112,11 +114,20 @@ public class ProdutosDAO {
         return false;
     }
     
-    public void retornarProdutos(CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, int id_usuario){
-        
+    public void retornarProdutosdoCarrinho(CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, int id_usuario, LocalDate data_criacao, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque){
         for (Produto listaProduto : this.listaProdutos) {
             if (listaProduto != null && bancoItens_Carrinho.jaExiste(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId())) {
                 this.pesquisarProduto(listaProduto.getId()).setQuantidade(this.pesquisarProduto(listaProduto.getId()).getQuantidade() + bancoItens_Carrinho.pesquisarItens_Carrinho(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId()).getQuantidade());
+                Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(listaProduto.getId(), bancoItens_Carrinho.pesquisarItens_Carrinho(listaProduto.getId(), bancoCarrinhos.pesquisarCarrinho(id_usuario).getId()).getQuantidade(), listaProduto.getPreco_venda(), "Entrada", data_criacao, bancoMovimentacao_Estoque);
+            }
+        }
+    }
+    
+    public void retornarProdutosdoPedido(PedidosDAO bancoPedidos, Itens_PedidoDAO bancoItens_Pedido, LocalDate data_criacao, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque, int id_pedido){
+        for (Produto listaProduto : this.listaProdutos) {
+            if (listaProduto != null && bancoItens_Pedido.jaExiste(listaProduto.getId(), id_pedido)) {
+                this.pesquisarProduto(listaProduto.getId()).setQuantidade(this.pesquisarProduto(listaProduto.getId()).getQuantidade() + bancoItens_Pedido.pesquisarItens_Pedido(listaProduto.getId(), id_pedido).getQuantidade());
+                Movimentacao_Estoque novoMovimentacao_Estoque = new Movimentacao_Estoque(listaProduto.getId(), bancoItens_Pedido.pesquisarItens_Pedido(listaProduto.getId(), id_pedido).getQuantidade(), listaProduto.getPreco_venda(), "Entrada", data_criacao, bancoMovimentacao_Estoque);
             }
         }
     }

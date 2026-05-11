@@ -50,4 +50,21 @@ public class Itens_PedidoDAO {
         
         return string;
     }
+    
+    public boolean jaExiste(int id_produto, int id_pedido){
+        for (Itens_Pedido index : this.listaItens_Pedido) {
+            if (index != null && index.getId_produto()== id_produto && index.getId_pedido() == id_pedido) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Itens_Pedido pesquisarItens_Pedido(int id_produto, int id_pedido){
+        for(int i = 0; i < this.listaItens_Pedido.length; i++){
+            if(this.listaItens_Pedido[i] != null && this.listaItens_Pedido[i].getId_produto() == id_produto && this.listaItens_Pedido[i].getId_pedido() == id_pedido)
+                return this.listaItens_Pedido[i];
+        }
+        return null;
+    }
 }

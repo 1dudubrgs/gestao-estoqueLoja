@@ -12,6 +12,7 @@ import Classes.Produto;
 import Classes.Usuario;
 import DAOs.CuponsDAO;
 import DAOs.CarrinhoDAO;
+import DAOs.EntregasDAO;
 import DAOs.Itens_CarrinhoDAO;
 import DAOs.Itens_PedidoDAO;
 import DAOs.Movimentacao_EstoqueDAO;
@@ -35,7 +36,7 @@ import javax.swing.JOptionPane;
  */
 public class Tela_Usuarios {
 
-    public static void main(Usuario user, Calendario calendario, PessoaDAO bancoPessoas, UsuarioDAO bancoUsuarios, ProdutosDAO bancoProdutos, CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, PedidosDAO bancoPedidos, CuponsDAO bancoCupons, Itens_PedidoDAO bancoItens_Pedido, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque) {
+    public static void main(Usuario user, Calendario calendario, PessoaDAO bancoPessoas, UsuarioDAO bancoUsuarios, ProdutosDAO bancoProdutos, CarrinhoDAO bancoCarrinhos, Itens_CarrinhoDAO bancoItens_Carrinho, PedidosDAO bancoPedidos, CuponsDAO bancoCupons, Itens_PedidoDAO bancoItens_Pedido, Movimentacao_EstoqueDAO bancoMovimentacao_Estoque, EntregasDAO bancoEntregas) {
 
         String tipoUser = user.getTipo();
 
@@ -49,15 +50,17 @@ public class Tela_Usuarios {
             3 - Manejar Pessoas
             4 - Manejar Usuários
             5 - Manejar Produtos
-            6 - Alterar Data Atual do Sistema
-            7 - Listar Movimentações de Estoque
-            8 - Relatório de vendas
-            9 - Relatório de Pedidos
-            10 - Relatório de Faturamento
-            11 - Deslogar
+            6 - Manejar Entregas
+            7 - Alterar Data Atual do Sistema
+            8 - Listar Movimentações de Estoque
+            9 - Histórico de Carrinhos
+            10 - Relatório de Vendas
+            11 - Relatório de Pedidos
+            12 - Relatório de Faturamento
+            13 - Deslogar
             """;
 
-            while (!inputPainelA.equals("11")) {
+            while (!inputPainelA.equals("13")) {
                 inputPainelA = JOptionPane.showInputDialog(painelAdmin);
                 switch (inputPainelA) {
                     case "1" -> {
@@ -330,6 +333,26 @@ public class Tela_Usuarios {
                         }
                     }
                     case "2" -> {
+                         boolean pararID = false;
+
+                        while (!pararID) {
+                            String id = JOptionPane.showInputDialog(null, bancoPedidos.toString(0, 0, 3) + "\n\nDigite o ID do pedido que deseja cancelar (ENTER para sair)");
+                            if (!id.equals("")) {
+                                int idINT = Integer.parseInt(id);
+                                if (bancoPedidos.pesquisarPedido(idINT) != null && !bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Cancelado")) {
+                                    pararID = true;
+                                    bancoProdutos.retornarProdutosdoPedido(bancoPedidos, bancoItens_Pedido, calendario.getDataHoje(), bancoMovimentacao_Estoque, idINT);
+                                    bancoPedidos.pesquisarPedido(idINT).setStatus("Cancelado");
+                                    bancoPedidos.pesquisarPedido(idINT).setData_modificacao(calendario.getDataHoje());
+                                    JOptionPane.showMessageDialog(null, "Pedido Cancelado com sucesso.");
+                                } else {
+                                    JOptionPane.showMessageDialog(null, "ID não encontrado, tente novamente.");
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Cancelando o cancelamento do pedido...");
+                                pararID = true;
+                            }
+                        }
                     }
                     case "3" -> {
                         boolean pararManejar = false;
@@ -917,6 +940,36 @@ public class Tela_Usuarios {
                         }
                     }
                     case "6" -> {
+                        boolean sair = false;
+                        String msg = """
+                                     1 - Listar as entregas
+                                     2 - Cancelar uma entrega
+                                     3 - Sair
+                                     """;
+                        
+                        
+                        while(!sair){
+                            String selecionarEntregas = JOptionPane.showInputDialog("Digite o que deseja fazer em relação as entregas:\n\n" + msg);
+                            switch (selecionarEntregas) {
+                                case "1" -> {
+                                    System.out.println(bancoEntregas.toString());
+                                }
+                                case "2" -> {
+                                    if(!bancoEntregas.estaVazio()){
+                                    
+                                    }
+                                    else{
+                                        JOptionPane.showMessageDialog(null, "Não há entregas para cancelar!");
+                                    }
+                                }
+                                case "3" -> {
+                                    sair = true;
+                                }
+                                default -> JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
+                            }
+                        }
+                    }
+                    case "7" -> {
                         DateTimeFormatter dataDiaMesAno = DateTimeFormatter.ofPattern("dd/MM/yyyy");
                                 
                         String novaData = JOptionPane.showInputDialog(
@@ -924,24 +977,83 @@ public class Tela_Usuarios {
                                 "\n\nDigite a nova data do sistema (ENTER para sair):\nSiga o seguinte modelo: Dia/Mes/Ano");
                         if(!novaData.equals("")){
                             LocalDate novaDataSistema = LocalDate.parse(novaData, dataDiaMesAno);
+
                             calendario.setDataHoje(novaDataSistema);
+                            bancoCarrinhos.expirarCarrinhos(calendario.getDataHoje());
+                            bancoPedidos.statusEnviadoOuEntregue(calendario.getDataHoje());
+                            
                             JOptionPane.showMessageDialog(null, "Data alterada com sucesso!");
                         }
                         else{
                             JOptionPane.showMessageDialog(null, "Cancelando alteração de data do sistema...");
                         }
                     }
-                    case "7" -> {
+                    case "8" -> {
                         JOptionPane.showMessageDialog(null, bancoMovimentacao_Estoque.toString());
                     }
-                    case "8" -> {
-                    }
                     case "9" -> {
+                        System.out.println(bancoCarrinhos.toString());
                     }
-                    case "10" -> {
-                        
-                    }
+                    case "10" -> {}
                     case "11" -> {
+                        boolean vazio = bancoPedidos.estaVazio(0);
+                        String resp = "";
+                                    
+                        if (!vazio) {
+                            while (!resp.equals("0")) {
+                                resp = JOptionPane.showInputDialog(null,"""
+                                                                    \n\nSelecione uma das ações abaixo:
+
+                                                                    1 - Relatório de pedidos abertos
+                                                                    2 - Relatório de pedidos pagos
+                                                                    3 - Relatório de pedidos cancelados                                      
+                                                                    0 - Sair do relatório                      
+                                                                    """);
+                                
+                                switch (resp) {
+                                    case "1" -> {
+                                        JOptionPane.showMessageDialog(null, bancoPedidos.toString(0, 0, 10));
+                                    }
+                                    case "2" -> {
+                                        JOptionPane.showMessageDialog(null, bancoPedidos.toString(0, 0, 20));
+                                    }
+                                    case "3" -> {
+                                        JOptionPane.showMessageDialog(null, bancoPedidos.toString(0, 0, 30));
+                                    }
+                                    case "0" -> {JOptionPane.showMessageDialog(null, "Saindo do relatório...");}
+                                    default -> JOptionPane.showMessageDialog(null, "Opção Invalida! Tente novamente");
+                                }
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, bancoPedidos.toString(0, 0, 0));
+                        }
+                    }
+                    case "12" -> {
+                        if(!bancoPedidos.estaVazio()){
+                            String msg = """
+                                         1 - Diário
+                                         2 - Mensal
+                                         3 - Anual
+                                         4 - Sair
+                                         """ + "\n";
+                            
+                            boolean sair = false;
+                            while(!sair){
+                                String opcoes = JOptionPane.showInputDialog("Digite uma das opções abaixo:\n\n" + msg);
+                                switch (opcoes) {
+                                    case "1" -> {JOptionPane.showMessageDialog(null, bancoPedidos.faturamentoDiario());}
+                                    case "2" -> {JOptionPane.showMessageDialog(null, bancoPedidos.faturamentoMensal());}
+                                    case "3" -> {JOptionPane.showMessageDialog(null, bancoPedidos.faturamentoAnual());}
+                                    case "4" -> {sair = true;}
+                                    default -> JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
+                                }
+                            }
+                        }   
+                        else{
+                            JOptionPane.showMessageDialog(null, "Não foi gerado nenhum pedido para relatar os faturamentos!");
+                        }
+                    }
+                    case "13" -> {
                         JOptionPane.showMessageDialog(null, "Deslogando...");
                     }
                     default ->
@@ -1118,7 +1230,7 @@ public class Tela_Usuarios {
                                         }
                                     }
                                     case "3" -> {
-                                        bancoProdutos.retornarProdutos(bancoCarrinhos, bancoItens_Carrinho, user.getId());
+                                        bancoProdutos.retornarProdutosdoCarrinho(bancoCarrinhos, bancoItens_Carrinho, user.getId(), calendario.getDataHoje(), bancoMovimentacao_Estoque);
                                         bancoCarrinhos.pesquisarCarrinho(user.getId()).setData_modificacao(calendario.getDataHoje());
                                         bancoCarrinhos.pesquisarCarrinho(user.getId()).setStatus("Cancelado");
                                         JOptionPane.showMessageDialog(null, "Cancelando carrinho...");
@@ -1292,10 +1404,79 @@ public class Tela_Usuarios {
                         
                     }
                     case "3" -> {
-                        
+                        boolean vazio = bancoPedidos.estaVazio(user.getId());
+                        String resp = "";
+                                    
+                        if (!vazio) {
+                            while (!resp.equals("0")) {
+                                resp = JOptionPane.showInputDialog(null, bancoPedidos.toString(1, user.getId(), 1) + """
+                                                                    \n\nSelecione uma das ações abaixo:
+
+                                                                    1 - Pagar um pedido
+                                                                    2 - Cancelar um pedido
+                                                                    0 - Sair do carrinho                      
+                                                                    """);
+                                
+                                switch (resp) {
+                                    case "1" -> {
+                                        boolean pararID = false;
+
+                                        while (!pararID) {
+                                            String id = JOptionPane.showInputDialog(null, bancoPedidos.toString(1, user.getId(), 1) + "\n\nDigite o ID do pedido que deseja pagar (ENTER para sair)");
+                                            if (!id.equals("")) {
+                                                int idINT = Integer.parseInt(id);
+                                                if (bancoPedidos.pesquisarPedido(idINT) != null && bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Criado")) {
+                                                    pararID = true;
+                                                    bancoPedidos.pesquisarPedido(idINT).setStatus("Pago");
+                                                    bancoPedidos.pesquisarPedido(idINT).setData_modificacao(calendario.getDataHoje());
+                                                    JOptionPane.showMessageDialog(null, "Pedido Pago com sucesso.");
+                                                    if(bancoPedidos.estaVazio(user.getId())){
+                                                        resp = "0";
+                                                    }
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "ID não encontrado, tente novamente.");
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Cancelando o pagamento do pedido...");
+                                                pararID = true;
+                                            }
+                                        }
+                                    }
+                                    case "2" -> {
+                                        boolean pararID = false;
+
+                                        while (!pararID) {
+                                            String id = JOptionPane.showInputDialog(null, bancoPedidos.toString(1, user.getId(), 1) + "\n\nDigite o ID do pedido que deseja cancelar (ENTER para sair)");
+                                            if (!id.equals("")) {
+                                                int idINT = Integer.parseInt(id);
+                                                if (bancoPedidos.pesquisarPedido(idINT) != null && (bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Criado") || bancoPedidos.pesquisarPedido(idINT).getStatus().equals("Pago"))) {
+                                                    pararID = true;
+                                                    bancoProdutos.retornarProdutosdoPedido(bancoPedidos, bancoItens_Pedido, calendario.getDataHoje(), bancoMovimentacao_Estoque, idINT);
+                                                    bancoPedidos.pesquisarPedido(idINT).setStatus("Cancelado");
+                                                    bancoPedidos.pesquisarPedido(idINT).setData_modificacao(calendario.getDataHoje());
+                                                    JOptionPane.showMessageDialog(null, "Pedido Cancelado com sucesso.");
+                                                    if(bancoPedidos.estaVazio(user.getId())){
+                                                        resp = "0";
+                                                    }
+                                                } else {
+                                                    JOptionPane.showMessageDialog(null, "ID não encontrado, tente novamente.");
+                                                }
+                                            } else {
+                                                JOptionPane.showMessageDialog(null, "Cancelando o cancelamento do pedido...");
+                                                pararID = true;
+                                            }
+                                        }
+                                    }
+                                    case "0" -> {JOptionPane.showMessageDialog(null, "Saindo dos pedidos...");}
+                                    default -> JOptionPane.showMessageDialog(null, "Opção Invalida! Tente novamente");
+                                }
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, bancoPedidos.toString(1, user.getId(), 1));
+                        }
                     }
                     case "4" -> {
-                        JOptionPane.showMessageDialog(null, bancoPedidos.toString(1, user.getId()));
+                        JOptionPane.showMessageDialog(null, bancoPedidos.toString(1, user.getId(), 0));
                     }
                     case "5" -> {JOptionPane.showMessageDialog(null, "Deslogando..");}
                     default ->

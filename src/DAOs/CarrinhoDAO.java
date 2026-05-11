@@ -5,6 +5,8 @@
 package DAOs;
 
 import Classes.Carrinho;
+import Sistema.Calendario;
+import java.time.LocalDate;
 
 /**
  *
@@ -105,6 +107,15 @@ public class CarrinhoDAO {
             if(this.listaCarrinhos[i].getId() == ID){
                 this.listaCarrinhos[i] = null;
                 i = this.listaCarrinhos.length;
+            }
+        }
+    }
+    
+    public void expirarCarrinhos(LocalDate dataSistema){
+        for(int i = 0; i<this.listaCarrinhos.length; i++){
+            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getStatus().equals("Aberto") && this.listaCarrinhos[i].getData_criacao().isBefore(dataSistema)){
+                this.listaCarrinhos[i].setStatus("Expirado");
+                this.listaCarrinhos[i].setData_modificacao(dataSistema);
             }
         }
     }

@@ -14,12 +14,14 @@ import Classes.Pessoa;
 import Classes.Produto;
 import Classes.Usuario;
 import Classes.Cupom;
+import Classes.Entregas;
 import Classes.Itens_Pedido;
 import Classes.Movimentacao_Estoque;
 import DAOs.CuponsDAO;
 import DAOs.ProdutosDAO;
 import DAOs.UsuarioDAO;
 import DAOs.CarrinhoDAO;
+import DAOs.EntregasDAO;
 import DAOs.Itens_CarrinhoDAO;
 import DAOs.Itens_PedidoDAO;
 import DAOs.Movimentacao_EstoqueDAO;
@@ -47,15 +49,16 @@ public class Tela_Inicial {
         CuponsDAO bancoCupons = new CuponsDAO(new Cupom[100]);
         Itens_PedidoDAO bancoItens_Pedido = new Itens_PedidoDAO(new Itens_Pedido[100]);
         Movimentacao_EstoqueDAO bancoMovimentacao_Estoque = new Movimentacao_EstoqueDAO(new Movimentacao_Estoque[100]);
+        EntregasDAO bancoEntregas = new EntregasDAO(new Entregas[100]);
         
-        //CRIANDO PESSOAS ADMIN
+                //CRIANDO PESSOAS ADMIN
         Pessoa pessoaAdmin1 = new Pessoa("Eduardo Borges Pereira", LocalDate.of(2007, Month.JANUARY, 22), "185.824.286-00", sistemaCalendario.getDataHoje(), bancoPessoas);
-        Pessoa pessoaAdmin2 = new Pessoa("Felipe Lara Facin", LocalDate.of(2007, Month.APRIL, 18), "000.000.000-00", sistemaCalendario.getDataHoje(), bancoPessoas);
+        Pessoa pessoaAdmin2 = new Pessoa("Felipe Lara Facin", LocalDate.of(2007, Month.APRIL, 18), "673.265.843-39", sistemaCalendario.getDataHoje(), bancoPessoas);
         
         //CRIANDO PESSOAS CLIENTE
         Pessoa pessoaCliente1 = new Pessoa("Frederica Santos Batista", LocalDate.of(1982, Month.FEBRUARY, 14), "321.555.402-20", sistemaCalendario.getDataHoje(), bancoPessoas);
-        Pessoa pessoaCliente2 = new Pessoa("a", LocalDate.of(2007, Month.JANUARY, 22), "111.111.111-11", sistemaCalendario.getDataHoje(), bancoPessoas);
-        Pessoa pessoaCliente3 = new Pessoa("b", LocalDate.of(2007, Month.APRIL, 18), "222.222.222-22", sistemaCalendario.getDataHoje(), bancoPessoas);
+        Pessoa pessoaCliente2 = new Pessoa("Caio Lima Chagas", LocalDate.of(1984, Month.DECEMBER, 25), "111.111.111-11", sistemaCalendario.getDataHoje(), bancoPessoas);
+        Pessoa pessoaCliente3 = new Pessoa("Renato Augusto Galhos", LocalDate.of(1999, Month.SEPTEMBER, 10), "222.222.222-22", sistemaCalendario.getDataHoje(), bancoPessoas);
         
         //CRIANDO USUARIOS ADMIN
         Usuario admin1 = new Administrador(pessoaAdmin1, "admin1", "AcessarLoja", sistemaCalendario.getDataHoje(), bancoUsuarios);
@@ -63,16 +66,40 @@ public class Tela_Inicial {
         
         //CRIANDO USUARIOS CLIENTE
         Usuario cliente1 = new Cliente(pessoaCliente1, "frederica", "123", sistemaCalendario.getDataHoje(), bancoUsuarios);
-        Cliente cliente2 = new Cliente(pessoaCliente2, "a", "a", sistemaCalendario.getDataHoje(), bancoUsuarios);
-        Cliente cliente3 = new Cliente(pessoaCliente3, "b", "b", sistemaCalendario.getDataHoje(), bancoUsuarios);
+        Usuario cliente2 = new Cliente(pessoaCliente2, "caio", "123", sistemaCalendario.getDataHoje(), bancoUsuarios);
+        Usuario cliente3 = new Cliente(pessoaCliente3, "renato", "123", sistemaCalendario.getDataHoje(), bancoUsuarios);
         
         //CRIANDO PRODUTOS
-        Produto produto1 = new Produto(10, "a", "a", 10.10, sistemaCalendario.getDataHoje(), bancoProdutos);
-        Produto produto2 = new Produto(20, "b", "b", 20.20, sistemaCalendario.getDataHoje(), bancoProdutos);
+        Produto produto1 = new Produto(10, "Mouse", "Um mouse muito bom.", 10.00, sistemaCalendario.getDataHoje(), bancoProdutos);
+        Produto produto2 = new Produto(20, "Teclado", "Esse teclado é massa.", 20.30, sistemaCalendario.getDataHoje(), bancoProdutos);
         
         //CRIANDO CUPONS
-        Cupom cupom1 = new Cupom("1", "Fixo", 2, 15, LocalDate.of(2026, Month.JUNE, 11), sistemaCalendario.getDataHoje(), bancoCupons);
-        Cupom cupom2 = new Cupom("2", "Percentual", 0.10, 8, LocalDate.of(2026, Month.JUNE, 10), sistemaCalendario.getDataHoje(), bancoCupons);
+        Cupom cupom1 = new Cupom("cupomF", "Fixo", 5, 15, LocalDate.of(2026, Month.DECEMBER, 11), sistemaCalendario.getDataHoje(), bancoCupons);
+        Cupom cupom2 = new Cupom("cupomP", "Percentual", 0.10, 8, LocalDate.of(2026, Month.DECEMBER, 10), sistemaCalendario.getDataHoje(), bancoCupons);
+        
+        //CRIANDO CARRINHOS
+        Carrinho carrinho1 = new Carrinho(cliente1, sistemaCalendario.getDataHoje(), bancoCarrinhos);
+        Carrinho carrinho2 = new Carrinho(cliente2, sistemaCalendario.getDataHoje(), bancoCarrinhos);
+        
+        //CRIANDO ITENS_CARRINHO
+        Itens_Carrinho itensCarrinho1 = new Itens_Carrinho(carrinho1, produto1, 3, sistemaCalendario.getDataHoje(), bancoItens_Carrinho);
+        Itens_Carrinho itensCarrinho2 = new Itens_Carrinho(carrinho2, produto1, 1, sistemaCalendario.getDataHoje(), bancoItens_Carrinho);
+        Itens_Carrinho itensCarrinho3 = new Itens_Carrinho(carrinho2, produto2, 10, sistemaCalendario.getDataHoje(), bancoItens_Carrinho);
+        
+        //CRIANDO PEDIDOS
+        Pedido pedido1 = new Pedido(3, 1, 20, "Pix", sistemaCalendario.getDataHoje(), bancoPedidos);
+        Pedido pedido2 = new Pedido(3, 2, 10, "Boleto", sistemaCalendario.getDataHoje(), bancoPedidos);
+        Pedido pedido3 = new Pedido(2, 1, 40.60, "Cartão de Crédito", sistemaCalendario.getDataHoje(), bancoPedidos);
+        
+        //CRIANDO ITENS_PEDIDO
+        Itens_Pedido itensPedido1 = new Itens_Pedido(1, 1, 2, 10.00, sistemaCalendario.getDataHoje(), bancoItens_Pedido);
+        Itens_Pedido itensPedido2 = new Itens_Pedido(2, 1, 1, 10.00, sistemaCalendario.getDataHoje(), bancoItens_Pedido);
+        Itens_Pedido itensPedido3 = new Itens_Pedido(3, 2, 2, 20.30, sistemaCalendario.getDataHoje(), bancoItens_Pedido);
+        
+        //CRIANDO MOVIMENTACOES_ESTOQUE
+        Movimentacao_Estoque movimentacaoEstoque1 = new Movimentacao_Estoque(1, 3, 10.00, "Entrada", sistemaCalendario.getDataHoje(), bancoMovimentacao_Estoque);
+        Movimentacao_Estoque movimentacaoEstoque2 = new Movimentacao_Estoque(1, 10, 10.00, "Ajuste", sistemaCalendario.getDataHoje(), bancoMovimentacao_Estoque);
+        Movimentacao_Estoque movimentacaoEstoque3 = new Movimentacao_Estoque(2, 5, 20.30, "Saída", sistemaCalendario.getDataHoje(), bancoMovimentacao_Estoque);
         
         String resp = "";
         String menu_I = """
@@ -124,7 +151,7 @@ public class Tela_Inicial {
 
                             if (bancoUsuarios.senhaExistente(inputSenha)) {
                                 JOptionPane.showMessageDialog(null, "Login efetuado com sucesso!");
-                                Tela_Usuarios.main(bancoUsuarios.UsuárioLogin(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos, bancoItens_Carrinho, bancoPedidos, bancoCupons, bancoItens_Pedido, bancoMovimentacao_Estoque);
+                                Tela_Usuarios.main(bancoUsuarios.UsuárioLogin(inputLog, inputSenha), sistemaCalendario, bancoPessoas, bancoUsuarios, bancoProdutos, bancoCarrinhos, bancoItens_Carrinho, bancoPedidos, bancoCupons, bancoItens_Pedido, bancoMovimentacao_Estoque, bancoEntregas);
                                 sair = true;
                             } else if (inputSenha.equals("")) {
                                 JOptionPane.showMessageDialog(null, "Cancelando o login...");

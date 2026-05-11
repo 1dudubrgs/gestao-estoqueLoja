@@ -76,6 +76,35 @@ public class Pedido {
     public void setData_modificacao(LocalDate data_modificacao) {
         this.data_modificacao = data_modificacao;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + this.id;
+        hash = 89 * hash + this.id_usuario;
+        hash = 89 * hash + this.id_cupom;
+        hash = 89 * hash + Objects.hashCode(this.status);
+        hash = 89 * hash + (int) (Double.doubleToLongBits(this.valor_total) ^ (Double.doubleToLongBits(this.valor_total) >>> 32));
+        hash = 89 * hash + Objects.hashCode(this.forma_pagamento);
+        hash = 89 * hash + Objects.hashCode(this.data_criacao);
+        hash = 89 * hash + Objects.hashCode(this.data_modificacao);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pedido other = (Pedido) obj;
+        return this.id == other.id;
+    }
     
     public String toString(int num) {
         DateTimeFormatter FormaData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -83,7 +112,7 @@ public class Pedido {
         String ModificacaoFormatada = data_modificacao.format(FormaData);
         
         if(num == 0)
-            return "ID = " + id + "\nID do Usuário(a) = " + id_usuario + "\nID do Cupom = " + id_cupom + "\n Status = " + status + "\nValor Total = " + valor_total + "\nForma de Pagamento = " + forma_pagamento + "\nData de Criação = " + CriacaoFormatada + "\nData de Modificação = " + ModificacaoFormatada;
+            return "ID = " + id + "\nID do Usuário(a) = " + id_usuario + "\nID do Cupom = " + id_cupom + "\nStatus = " + status + "\nValor Total = " + valor_total + "\nForma de Pagamento = " + forma_pagamento + "\nData de Criação = " + CriacaoFormatada + "\nData de Modificação = " + ModificacaoFormatada;
         else
             return "ID = " + id + "\nStatus = " + status + "\nValor Total = " + valor_total + "\nForma de Pagamento = " + forma_pagamento + "\nData de Criação = " + CriacaoFormatada;
     }
