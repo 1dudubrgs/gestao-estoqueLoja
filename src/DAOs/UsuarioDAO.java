@@ -96,6 +96,7 @@ public class UsuarioDAO {
     public void RemoverUsuario(Usuario usuario){
         for(int i = 0; i < this.listaUsuarios.length; i++){
             if(this.listaUsuarios[i] != null && this.listaUsuarios[i].equals(usuario)){
+                this.listaUsuarios[i] = null;
                 JOptionPane.showMessageDialog(null, "Usuário Removido com Sucesso!");
                 i = this.listaUsuarios.length;
             }

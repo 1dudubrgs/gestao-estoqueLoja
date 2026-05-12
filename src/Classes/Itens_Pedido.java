@@ -7,6 +7,7 @@ package Classes;
 import DAOs.Itens_PedidoDAO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  *
@@ -36,6 +37,8 @@ public class Itens_Pedido {
         bancoItens_Pedido.inserirItens_Pedido(this);
     }
 
+    public Itens_Pedido(){}
+    
     public int getId() {
         return id;
     }
@@ -83,5 +86,34 @@ public class Itens_Pedido {
         } else {
             return "\nID do Produto = " + id_produto + "\nQuantidade = " + quantidade + "\nPreço Unitário = " + preco_unitario + "\nSubtotal = " + subtotal;
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + this.id;
+        hash = 41 * hash + this.id_pedido;
+        hash = 41 * hash + this.id_produto;
+        hash = 41 * hash + this.quantidade;
+        hash = 41 * hash + (int) (Double.doubleToLongBits(this.preco_unitario) ^ (Double.doubleToLongBits(this.preco_unitario) >>> 32));
+        hash = 41 * hash + (int) (Double.doubleToLongBits(this.subtotal) ^ (Double.doubleToLongBits(this.subtotal) >>> 32));
+        hash = 41 * hash + Objects.hashCode(this.data_criacao);
+        hash = 41 * hash + Objects.hashCode(this.data_modificacao);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Itens_Pedido other = (Itens_Pedido) obj;
+        return this.id == other.id;
     }
 }

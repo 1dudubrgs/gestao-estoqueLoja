@@ -100,7 +100,7 @@ public class Itens_CarrinhoDAO {
     
     public void removerItens_Carrinho(int ID){
         for(int i = 0; i < this.listaItens_Carrinho.length; i++){
-            if(this.listaItens_Carrinho[i].getId() == ID){
+            if(this.listaItens_Carrinho[i] != null &&  this.listaItens_Carrinho[i].getId() == ID){
                 this.listaItens_Carrinho[i] = null;
                 i = this.listaItens_Carrinho.length;
             }

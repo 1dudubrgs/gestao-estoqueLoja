@@ -35,6 +35,8 @@ public class Usuario {
         bancoUsuarios.adicionarUsuario(this);
     }
     
+    public Usuario(){}
+    
     public int getId() {
         return id;
     }

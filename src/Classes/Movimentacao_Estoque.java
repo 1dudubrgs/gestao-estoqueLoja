@@ -7,6 +7,7 @@ package Classes;
 import DAOs.Movimentacao_EstoqueDAO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  *
@@ -34,6 +35,8 @@ public class Movimentacao_Estoque {
         bancoMovimentacao_Estoque.inserirMovimentacao_Estoque(this);
     }
 
+    public Movimentacao_Estoque(){}
+    
     public int getId() {
         return id;
     }
@@ -73,5 +76,33 @@ public class Movimentacao_Estoque {
         String ModificacaoFormatada = data_modificacao.format(FormaData);
         
         return "ID = " + id + "\nID do Produto = " + id_produto + "\nQuantidade = " + quantidade + "\nTipo = " + tipo + "\nValor Unitário = " + valor_unitario + "\nData de Criação = " + CriacaoFormatada + "\nData de Modificação = " + ModificacaoFormatada;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 43 * hash + this.id;
+        hash = 43 * hash + this.id_produto;
+        hash = 43 * hash + this.quantidade;
+        hash = 43 * hash + Objects.hashCode(this.tipo);
+        hash = 43 * hash + (int) (Double.doubleToLongBits(this.valor_unitario) ^ (Double.doubleToLongBits(this.valor_unitario) >>> 32));
+        hash = 43 * hash + Objects.hashCode(this.data_criacao);
+        hash = 43 * hash + Objects.hashCode(this.data_modificacao);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Movimentacao_Estoque other = (Movimentacao_Estoque) obj;
+        return this.id == other.id;
     }
 }

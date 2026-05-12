@@ -142,14 +142,14 @@ public class PedidosDAO {
     
     public void statusEnviadoOuEntregue(LocalDate dataSistema, EntregasDAO bancoEntregas){
         for(int i = 0; i<this.listaPedidos.length; i++){
-            if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Pago") && this.listaPedidos[i].getData_criacao().isBefore(dataSistema)){
+            if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Pago") && this.listaPedidos[i].getData_modificacao().isBefore(dataSistema)){
                 this.listaPedidos[i].setStatus("Enviado");
                 this.listaPedidos[i].setData_modificacao(dataSistema);
                 bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_envio(dataSistema);
                 bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_modificacao(dataSistema);
                 bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setStatus("Enviado");
             }
-            else if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Enviado") && this.listaPedidos[i].getData_criacao().isBefore(dataSistema)){
+            else if(this.listaPedidos[i] != null && this.listaPedidos[i].getStatus().equals("Enviado") && this.listaPedidos[i].getData_modificacao().isBefore(dataSistema)){
                 this.listaPedidos[i].setStatus("Entregue");
                 this.listaPedidos[i].setData_modificacao(dataSistema);
                 bancoEntregas.procurarEntregaPedidoID(this.listaPedidos[i].getId()).setData_entrega(dataSistema);
@@ -259,7 +259,7 @@ public class PedidosDAO {
             if(this.listaPedidos[i] != null && (this.listaPedidos[i].getStatus().equals("Enviado") || this.listaPedidos[i].getStatus().equals("Entregue"))){
                 
                 for(int i2 = 0; i2<contDiasUsados; i2++){
-                    if(this.listaPedidos[i].getData_modificacao()== diasUsados[i2]){
+                    if(this.listaPedidos[i].getData_modificacao().equals(diasUsados[i2])){
                         jaFoiContado = true;
                     }
                 }
@@ -270,7 +270,7 @@ public class PedidosDAO {
                         if(this.listaPedidos[i3] != null 
                            && (this.listaPedidos[i3].getStatus().equals("Enviado") || this.listaPedidos[i3].getStatus().equals("Entregue")) 
                            && !(this.listaPedidos[i3].equals(this.listaPedidos[i]))
-                           && this.listaPedidos[i3].getData_modificacao() == this.listaPedidos[i].getData_modificacao())
+                           && this.listaPedidos[i3].getData_modificacao().equals(this.listaPedidos[i].getData_modificacao()))
                         {
                             soma += this.listaPedidos[i3].getValor_total();
                         }
@@ -370,5 +370,14 @@ public class PedidosDAO {
             jaFoiContado = false;
         }
         return vendas;
+    }
+    
+    public void removerPedido(int ID){
+        for(int i = 0; i<this.listaPedidos.length; i++){
+            if(this.listaPedidos[i] != null && this.listaPedidos[i].getId() == ID){
+                this.listaPedidos[i] = null;
+                i = this.listaPedidos.length;
+            }
+        }
     }
 }

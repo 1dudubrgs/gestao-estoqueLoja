@@ -30,6 +30,8 @@ public class Carrinho {
         bancoCarrinhos.adicionarCarrinho(this);
     }
 
+    public Carrinho(){}
+    
     public int getId() {
         return id;
     }
@@ -66,4 +68,27 @@ public class Carrinho {
         
         return "ID = " + id + "\nID do Usuário(a) = " + id_usuario + "\nStatus = " + status + "\nData de Criação = " + CriacaoFormatada + "\nData de Modificação = " + ModificacaoFormatada;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Carrinho other = (Carrinho) obj;
+        return this.id == other.id;
+    }
+    
+    
 }

@@ -37,6 +37,8 @@ public class Pedido {
         bancoPedidos.inserirPedido(this);
     }
 
+    public Pedido(){}
+    
     public int getId() {
         return id;
     }

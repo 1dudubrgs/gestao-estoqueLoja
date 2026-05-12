@@ -48,4 +48,12 @@ public class Movimentacao_EstoqueDAO {
         return string;
     }
     
+    public void removerMovimentacao_Estoque(int ID){
+        for(int i = 0; i<this.listaMovimentacao_Estoque.length; i++){
+            if(this.listaMovimentacao_Estoque[i] != null && this.listaMovimentacao_Estoque[i].getId() == ID){
+                this.listaMovimentacao_Estoque[i] = null;
+                i = this.listaMovimentacao_Estoque.length;
+            }
+        }
+    }
 }

@@ -56,7 +56,7 @@ public class CarrinhoDAO {
         for(int i = 0; i < this.listaCarrinhos.length; i++){
             if(this.listaCarrinhos[i] == null)
                 cont++;
-            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getId_usuario() == id_usuario && this.listaCarrinhos[i].getStatus() == "Aberto"){
+            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getId_usuario() == id_usuario && this.listaCarrinhos[i].getStatus().equals("Aberto")){
                 aux = 1;
             }
         }
@@ -73,7 +73,7 @@ public class CarrinhoDAO {
         for(int i = 0; i < this.listaCarrinhos.length; i++){
             if(this.listaCarrinhos[i] == null)
                 cont++;
-            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getStatus() == "Aberto"){
+            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getStatus().equals("Aberto")){
                 aux = 1;
             }
         }
@@ -104,7 +104,7 @@ public class CarrinhoDAO {
     
     public void removerCarrinho(int ID){
         for(int i = 0; i < this.listaCarrinhos.length; i++){
-            if(this.listaCarrinhos[i].getId() == ID){
+            if(this.listaCarrinhos[i] != null && this.listaCarrinhos[i].getId() == ID){
                 this.listaCarrinhos[i] = null;
                 i = this.listaCarrinhos.length;
             }

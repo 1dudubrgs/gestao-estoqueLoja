@@ -11,6 +11,7 @@ import DAOs.PessoaDAO;
 import DAOs.UsuarioDAO;
 import Sistema.Calendario;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,11 +29,12 @@ public class Tela_Cadastro {
         String inputCPF = "";
         String inputLogin = "";
         String inputSenha = "";
+        DateTimeFormatter dma = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         
         while(!sair){
             inputNome = JOptionPane.showInputDialog("Digite o seu nome (ENTER para cancelar):");
             if(!inputNome.equals("")){
-                inputDataNascimento = JOptionPane.showInputDialog("Digite a sua data de nascimento (ENTER para cancelar)\nESCREVA DA SEGUINTE FORMA: (ano-mes-dia):");
+                inputDataNascimento = JOptionPane.showInputDialog("Digite a sua data de nascimento (ENTER para cancelar)\nESCREVA DA SEGUINTE FORMA: (Dia/Mês/Ano):");
                 if(!inputDataNascimento.equals("")){
                     while(!sairCPF){
                         inputCPF = JOptionPane.showInputDialog("Digite o seu CPF (ENTER para cancelar):\nESCREVA DA SEGUINTE FORMA: 000.000.000-00");
@@ -45,7 +47,7 @@ public class Tela_Cadastro {
                                     sair = true;
                                     sairLogin = true;
                                     
-                                    Pessoa novaPessoa = new Pessoa(inputNome, LocalDate.parse(inputDataNascimento), inputCPF, calendario.getDataHoje(), bancoPessoas);
+                                    Pessoa novaPessoa = new Pessoa(inputNome, LocalDate.parse(inputDataNascimento, dma), inputCPF, calendario.getDataHoje(), bancoPessoas);
                                     Usuario novoUsuario = new Cliente(novaPessoa, inputLogin, inputSenha, calendario.getDataHoje(), bancoUsuarios);
                                 }
                                 else if(inputLogin.equals("")){

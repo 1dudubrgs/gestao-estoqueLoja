@@ -67,4 +67,13 @@ public class Itens_PedidoDAO {
         }
         return null;
     }
+    
+    public void removerPedido(int ID){
+        for(int i = 0; i<this.listaItens_Pedido.length; i++){
+            if(this.listaItens_Pedido[i] != null && this.listaItens_Pedido[i].getId() == ID){
+                this.listaItens_Pedido[i] = null;
+                i = this.listaItens_Pedido.length;
+            }
+        }
+    }
 }

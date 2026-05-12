@@ -33,6 +33,8 @@ public class Pessoa {
         bancoPessoas.adicionarPessoa(this);
     }
 
+    public Pessoa(){}
+    
     public int getId() {
         return id;
     }

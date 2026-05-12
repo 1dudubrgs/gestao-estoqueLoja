@@ -656,7 +656,7 @@ public class Tela_Usuarios {
                                                             }
                                                         }
                                                         case "4" -> {
-                                                            if(usuario.getTipo() == "CLIENTE"){
+                                                            if(usuario.getTipo().equals("CLIENTE")){
                                                                 usuario.setTipo("ADMINISTRADOR");
                                                                 usuario.setData_modificacao(calendario.getDataHoje());
                                                                 JOptionPane.showMessageDialog(null, "O usuário foi promovido a administrador do sistema!");
@@ -1053,8 +1053,24 @@ public class Tela_Usuarios {
                                             JOptionPane.showMessageDialog(null, "Cancelando relatório de vendas por período...");
                                         }
                                     }
-                                    case "2" -> {JOptionPane.showMessageDialog(null, bancoPedidos.vendasCliente());}
-                                    case "3" -> {JOptionPane.showMessageDialog(null, bancoPedidos.vendasStatus());}
+                                    case "2" -> {
+                                        String vendas = bancoPedidos.vendasCliente();
+                                        if(!vendas.equals("")){
+                                            JOptionPane.showMessageDialog(null, vendas);
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Nenhuma venda foi realizada ainda!");
+                                        }
+                                    }
+                                    case "3" -> {
+                                        String vendas = bancoPedidos.vendasStatus();
+                                        if(!vendas.equals("")){
+                                            JOptionPane.showMessageDialog(null, vendas);
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Nenhuma venda foi realizada ainda!");
+                                        }
+                                    }
                                     case "4" -> {sair = true;}
                                     default -> JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
                                 }
@@ -1110,9 +1126,33 @@ public class Tela_Usuarios {
                             while(!sair){
                                 String opcoes = JOptionPane.showInputDialog("Digite uma das opções abaixo:\n\n" + msg);
                                 switch (opcoes) {
-                                    case "1" -> {JOptionPane.showMessageDialog(null, bancoPedidos.faturamentoDiario());}
-                                    case "2" -> {JOptionPane.showMessageDialog(null, bancoPedidos.faturamentoMensal());}
-                                    case "3" -> {JOptionPane.showMessageDialog(null, bancoPedidos.faturamentoAnual());}
+                                    case "1" -> {
+                                        String faturamento = bancoPedidos.faturamentoDiario();
+                                        if(!faturamento.equals("")){
+                                            JOptionPane.showMessageDialog(null, faturamento);
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Nenenhum pedido foi enviado ou entregue ainda!");
+                                        }
+                                    }
+                                    case "2" -> {
+                                        String faturamento = bancoPedidos.faturamentoMensal();
+                                        if(!faturamento.equals("")){
+                                            JOptionPane.showMessageDialog(null, faturamento);
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Nenenhum pedido foi enviado ou entregue ainda!");
+                                        }
+                                    }
+                                    case "3" -> {
+                                        String faturamento = bancoPedidos.faturamentoAnual();
+                                        if(!faturamento.equals("")){
+                                            JOptionPane.showMessageDialog(null, faturamento);
+                                        }
+                                        else{
+                                            JOptionPane.showMessageDialog(null, "Nenenhum pedido foi enviado ou entregue ainda!");
+                                        }
+                                    }
                                     case "4" -> {sair = true;}
                                     default -> JOptionPane.showMessageDialog(null, "Insira uma opção válida!");
                                 }
@@ -1271,7 +1311,7 @@ public class Tela_Usuarios {
                                                                 formaPagamento = "Boleto";
                                                             }
                                                             if(id_cupom != 0){
-                                                                if (bancoCupons.procurarCupomID(id_cupom).getTipo_desconto() == "Fixo"){
+                                                                if (bancoCupons.procurarCupomID(id_cupom).getTipo_desconto().equals("Fixo")){
                                                                     subTotal -= bancoCupons.procurarCupomID(id_cupom).getValor_desconto();
                                                                 } else {
                                                                     subTotal -= bancoCupons.procurarCupomID(id_cupom).getValor_desconto() * subTotal;

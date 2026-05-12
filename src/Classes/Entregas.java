@@ -40,6 +40,8 @@ public class Entregas {
         bancoEntregas.adicionarEntrega(this);
     }
 
+    public Entregas(){}
+    
     public int getId() {
         return id;
     }

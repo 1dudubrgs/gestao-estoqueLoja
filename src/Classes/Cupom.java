@@ -43,6 +43,9 @@ public class Cupom {
         bancoCupons.adicionarCupon(this);    
     }
 
+    public Cupom(){
+    }
+    
     public int getId() {
         return id;
     }

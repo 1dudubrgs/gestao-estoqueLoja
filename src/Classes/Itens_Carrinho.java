@@ -7,6 +7,7 @@ package Classes;
 import DAOs.Itens_CarrinhoDAO;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 /**
  *
@@ -35,6 +36,8 @@ public class Itens_Carrinho {
         bancoItens_Carrinho.adicionarItens_Carrinho(this);
     }
 
+    public Itens_Carrinho(){}
+    
     public int getId() {
         return id;
     }
@@ -81,5 +84,32 @@ public class Itens_Carrinho {
         else
             return "ID do Produto = " + id_produto + "\nQuantidade = " + quantidade + "\nPreço Unitário = " + preco_unitario;
     }
-    
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + this.id;
+        hash = 83 * hash + this.id_carrinho;
+        hash = 83 * hash + this.id_produto;
+        hash = 83 * hash + this.quantidade;
+        hash = 83 * hash + (int) (Double.doubleToLongBits(this.preco_unitario) ^ (Double.doubleToLongBits(this.preco_unitario) >>> 32));
+        hash = 83 * hash + Objects.hashCode(this.data_criacao);
+        hash = 83 * hash + Objects.hashCode(this.data_modificacao);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Itens_Carrinho other = (Itens_Carrinho) obj;
+        return this.id == other.id;
+    }
 }

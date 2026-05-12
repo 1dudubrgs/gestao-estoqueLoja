@@ -38,6 +38,8 @@ public class Produto {
         bancoProdutos.inserirProduto(this);
     }
 
+    public Produto(){}
+    
     public int getQuantidade() {
         return quantidade;
     }

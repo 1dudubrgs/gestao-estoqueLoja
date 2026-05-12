@@ -57,7 +57,7 @@ public class PessoaDAO {
 
     public void removerPessoaID(int ID){
         for(int i = 0; i < this.Pessoas.length; i++){
-            if(this.Pessoas[i].getId() == ID){
+            if(this.Pessoas[i] != null && this.Pessoas[i].getId() == ID){
                 this.Pessoas[i] = null;
                 i = this.Pessoas.length;
             }

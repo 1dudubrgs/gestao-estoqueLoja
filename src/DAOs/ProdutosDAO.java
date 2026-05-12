@@ -7,7 +7,6 @@ package DAOs;
 import Classes.Movimentacao_Estoque;
 import Classes.Produto;
 import java.time.LocalDate;
-import java.util.Arrays;
 import javax.swing.JOptionPane;
 
 /**
@@ -48,28 +47,6 @@ public class ProdutosDAO {
         return string;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 97 * hash + Arrays.deepHashCode(this.listaProdutos);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ProdutosDAO other = (ProdutosDAO) obj;
-        return Arrays.deepEquals(this.listaProdutos, other.listaProdutos);
-    }
-    
     public void inserirProduto(Produto produto){
         for(int i = 0; i<this.listaProdutos.length; i++){
             if(this.listaProdutos[i] == null){
@@ -90,7 +67,7 @@ public class ProdutosDAO {
     public boolean removerProduto(int id){
         if(pesquisarProduto(id) != null){
             for(int i = 0; i < this.listaProdutos.length; i++){
-                if(this.listaProdutos[i].equals(pesquisarProduto(id))){
+                if(this.listaProdutos[i] != null &&  this.listaProdutos[i].equals(pesquisarProduto(id))){
                     this.listaProdutos[i] = null;
                     JOptionPane.showMessageDialog(null, "Produto removido com sucesso!");
                     return true;
